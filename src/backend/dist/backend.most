@@ -1,0 +1,52 @@
+// Version: 1.0.0
+type BookingId__572944220 = Nat;
+type BookingId__941093322 = BookingId__572944220;
+type BookingStatus__813273820 = {#cancelled; #confirmed; #pending};
+type Booking__239030193 =
+  {
+    createdAt : Timestamp__960879157;
+    customerEmail : Text;
+    customerName : Text;
+    customerPhone : Text;
+    id : BookingId__941093322;
+    preferredDateTime : Text;
+    serviceId : ServiceId__710150494;
+    status : BookingStatus__813273820;
+    teamMemberId : ?TeamMemberId__299473648
+  };
+type List__415060402<T> = List__790383201<T>;
+type List__790383201<T> =
+  {
+    var blockIndex : Nat__490723111;
+    var blocks : [var [var ?T]];
+    var elementIndex : Nat__490723111
+  };
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type ServiceCategory__816978057 = {#beardTrim; #fade; #haircut; #lineup};
+type ServiceId__271116140 = Nat;
+type ServiceId__710150494 = ServiceId__271116140;
+type Service__456548445 =
+  {
+    category : ServiceCategory__816978057;
+    description : Text;
+    durationMinutes : Nat;
+    id : ServiceId__710150494;
+    name : Text;
+    price : Nat
+  };
+type TeamMemberId__299473648 = TeamMemberId__757761988;
+type TeamMemberId__757761988 = Nat;
+type TeamMember__115986380 =
+  {id : TeamMemberId__299473648; name : Text; specialty : Text};
+type Timestamp__301639476 = Int;
+type Timestamp__960879157 = Timestamp__301639476;
+actor {
+  stable state :
+    {
+      bookings : List__415060402<Booking__239030193>;
+      var nextBookingId : Nat;
+      services : List__415060402<Service__456548445>;
+      teamMembers : List__415060402<TeamMember__115986380>
+    }
+};

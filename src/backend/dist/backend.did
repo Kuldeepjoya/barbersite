@@ -1,0 +1,68 @@
+type Timestamp = int;
+type TeamMemberId = nat;
+type TeamMember = 
+ record {
+   id: TeamMemberId;
+   name: text;
+   specialty: text;
+ };
+type ServiceId = nat;
+type ServiceCategory = 
+ variant {
+   beardTrim;
+   fade;
+   haircut;
+   lineup;
+ };
+type Service = 
+ record {
+   category: ServiceCategory;
+   description: text;
+   durationMinutes: nat;
+   id: ServiceId;
+   name: text;
+   price: nat;
+ };
+type BookingStatus = 
+ variant {
+   cancelled;
+   confirmed;
+   pending;
+ };
+type BookingResult = 
+ variant {
+   err: text;
+   ok: Booking;
+ };
+type BookingRequest = 
+ record {
+   customerEmail: text;
+   customerName: text;
+   customerPhone: text;
+   preferredDateTime: text;
+   serviceId: ServiceId;
+   teamMemberId: opt TeamMemberId;
+ };
+type BookingId = nat;
+type Booking = 
+ record {
+   createdAt: Timestamp;
+   customerEmail: text;
+   customerName: text;
+   customerPhone: text;
+   id: BookingId;
+   preferredDateTime: text;
+   serviceId: ServiceId;
+   status: BookingStatus;
+   teamMemberId: opt TeamMemberId;
+ };
+service : {
+  cancelBooking: (id: BookingId) -> (BookingResult);
+  createBooking: (req: BookingRequest) -> (BookingResult);
+  getBooking: (id: BookingId) -> (opt Booking) query;
+  getService: (id: ServiceId) -> (opt Service) query;
+  getTeamMember: (id: TeamMemberId) -> (opt TeamMember) query;
+  listBookings: () -> (vec Booking) query;
+  listServices: () -> (vec Service) query;
+  listTeamMembers: () -> (vec TeamMember) query;
+}
