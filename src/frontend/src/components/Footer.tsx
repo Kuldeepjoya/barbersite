@@ -40,10 +40,6 @@ const footerIconBg: React.CSSProperties = {
 
 export function Footer() {
   const year = new Date().getFullYear();
-  const hostname =
-    typeof window !== "undefined" ? window.location.hostname : "";
-  const caffeineUrl = `https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`;
-
   return (
     <footer
       id="contact"
@@ -239,19 +235,21 @@ export function Footer() {
       <div className="border-t" style={footerBorder}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs" style={footerTextMuted}>
-            © {year} Master Deepak Hair Expert. Built with love using{" "}
+            © {year} Master Deepak Hair Expert. All rights reserved.
+          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs" style={footerTextMuted}>
+              Cut, Color &amp; Chemical · Mumbai &amp; Bhilwara
+            </p>
             <a
-              href={caffeineUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent transition-smooth"
+              href="/admin"
+              data-ocid="footer-admin-link"
+              className="text-[10px] opacity-30 hover:opacity-60 transition-smooth"
+              style={footerTextMuted}
             >
-              caffeine.ai
+              Admin
             </a>
-          </p>
-          <p className="text-xs" style={footerTextMuted}>
-            Cut, Color &amp; Chemical · Mumbai &amp; Bhilwara
-          </p>
+          </div>
         </div>
       </div>
     </footer>

@@ -14,27 +14,39 @@ export interface Booking {
   'id' : BookingId,
   'customerName' : string,
   'status' : BookingStatus,
+  'paymentStatus' : PaymentStatus,
   'customerPhone' : string,
   'teamMemberId' : [] | [TeamMemberId],
   'createdAt' : Timestamp,
   'preferredDateTime' : string,
-  'serviceId' : ServiceId,
+  'serviceIds' : Array<ServiceId>,
+  'referenceCode' : string,
+  'totalAmount' : bigint,
+  'stripeSessionId' : [] | [string],
   'customerEmail' : string,
 }
 export type BookingId = bigint;
-export interface BookingRequest {
-  'customerName' : string,
-  'customerPhone' : string,
-  'teamMemberId' : [] | [TeamMemberId],
-  'preferredDateTime' : string,
-  'serviceId' : ServiceId,
-  'customerEmail' : string,
-}
 export type BookingResult = { 'ok' : Booking } |
   { 'err' : string };
 export type BookingStatus = { 'cancelled' : null } |
   { 'pending' : null } |
   { 'confirmed' : null };
+export interface CheckoutRequest {
+  'customerName' : string,
+  'cancelUrl' : string,
+  'customerPhone' : string,
+  'teamMemberId' : [] | [TeamMemberId],
+  'preferredDateTime' : string,
+  'serviceIds' : Array<ServiceId>,
+  'customerEmail' : string,
+  'successUrl' : string,
+}
+export type CheckoutSessionResult = {
+    'ok' : { 'checkoutUrl' : string, 'sessionId' : string }
+  } |
+  { 'err' : string };
+export type PaymentStatus = { 'paid' : null } |
+  { 'unpaid' : null };
 export interface Service {
   'id' : ServiceId,
   'name' : string,
@@ -48,6 +60,17 @@ export type ServiceCategory = { 'fade' : null } |
   { 'beardTrim' : null } |
   { 'lineup' : null };
 export type ServiceId = bigint;
+export interface ShoppingItem {
+  'productName' : string,
+  'currency' : string,
+  'quantity' : bigint,
+  'priceInCents' : bigint,
+  'productDescription' : string,
+}
+export type StripeSessionStatus = {
+    'completed' : { 'userPrincipal' : [] | [string], 'response' : string }
+  } |
+  { 'failed' : { 'error' : string } };
 export interface TeamMember {
   'id' : TeamMemberId,
   'name' : string,
@@ -55,15 +78,46 @@ export interface TeamMember {
 }
 export type TeamMemberId = bigint;
 export type Timestamp = bigint;
+export interface TransformationInput {
+  'context' : Uint8Array,
+  'response' : http_request_result,
+}
+export interface TransformationOutput {
+  'status' : bigint,
+  'body' : Uint8Array,
+  'headers' : Array<http_header>,
+}
+export interface http_header { 'value' : string, 'name' : string }
+export interface http_request_result {
+  'status' : bigint,
+  'body' : Uint8Array,
+  'headers' : Array<http_header>,
+}
 export interface _SERVICE {
   'cancelBooking' : ActorMethod<[BookingId], BookingResult>,
-  'createBooking' : ActorMethod<[BookingRequest], BookingResult>,
+  'confirmBookingAfterPayment' : ActorMethod<[string], BookingResult>,
+  'createCheckoutSession' : ActorMethod<
+    [Array<ShoppingItem>, string, string],
+    string
+  >,
+  'createStripeCheckoutSession' : ActorMethod<
+    [CheckoutRequest],
+    CheckoutSessionResult
+  >,
   'getBooking' : ActorMethod<[BookingId], [] | [Booking]>,
   'getService' : ActorMethod<[ServiceId], [] | [Service]>,
+  'getStripeSessionStatus' : ActorMethod<[string], StripeSessionStatus>,
   'getTeamMember' : ActorMethod<[TeamMemberId], [] | [TeamMember]>,
+  'isStripeConfigured' : ActorMethod<[], boolean>,
+  'listAllBookings' : ActorMethod<[], Array<Booking>>,
   'listBookings' : ActorMethod<[], Array<Booking>>,
+  'listBookingsByDate' : ActorMethod<[string], Array<Booking>>,
+  'listFutureBookings' : ActorMethod<[], Array<Booking>>,
   'listServices' : ActorMethod<[], Array<Service>>,
   'listTeamMembers' : ActorMethod<[], Array<TeamMember>>,
+  'markBookingPaid' : ActorMethod<[BookingId], BookingResult>,
+  'setStripeConfiguration' : ActorMethod<[string], undefined>,
+  'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

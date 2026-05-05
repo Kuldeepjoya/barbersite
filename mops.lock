@@ -1,8 +1,10 @@
 {
   "version": 3,
-  "mopsTomlDepsHash": "a82497d581efbd0ce845284ff64ff1d18e7277223c42720c6b478795b2fa0cb0",
+  "mopsTomlDepsHash": "d4409da60671ce93f4e45f0165909a4915de42794858d4ca531fcb33c1f9f5da",
   "deps": {
-    "core": "2.2.0"
+    "core": "2.2.0",
+    "caffeineai-stripe": "0.1.1",
+    "caffeineai-http-outcalls": "0.1.1"
   },
   "hashes": {
     "core@2.2.0": {
@@ -60,6 +62,21 @@
       "core@2.2.0/src/pure/Map.mo": "e9868fc4dd5e8e6272382e33241c59f8664e3de2e618cbf62fa8b20beabecfab",
       "core@2.2.0/src/pure/RealTimeQueue.mo": "af133ae61c69ce4e00db5e9db53ddeccad84373fef82a156c85360c2426349dd",
       "core@2.2.0/src/pure/Set.mo": "f0155b1d548cbc8889fcff75ef52f0cab7998b034621e4faac8d3b79d7bbac07"
+    },
+    "caffeineai-stripe@0.1.1": {
+      "caffeineai-stripe@0.1.1/mops.toml": "bfdbf745c9573359cf2510776098077672b8e2ec87f1746657edccee9a2fdcd7",
+      "caffeineai-stripe@0.1.1/rules/set-stripe-configuration.toml": "e1adad0e77cc5f71ff565a2977b07cf054606ba07690437eb34d8231e418dba1",
+      "caffeineai-stripe@0.1.1/README.md": "a74257ccf4bfb5c4864ae17e17f53d5a44db648d552380559f46c4454aee55fd",
+      "caffeineai-stripe@0.1.1/rules/get-stripe-session-status.toml": "bac773362afb5e19e2d4b977b17bc3e099338333c8afc9e970d09406aa544ddf",
+      "caffeineai-stripe@0.1.1/rules/transform-function.toml": "594141c47b60a39b5170c05a8f4a24e1a183205e5a365cfe62765e8f8debc018",
+      "caffeineai-stripe@0.1.1/src/stripe.mo": "2e7207e79b9c5739574cd60b819404da7faf17a6ffa87f28165d9dd118be4625",
+      "caffeineai-stripe@0.1.1/rules/is-stripe-configured.toml": "61d5eb589aa1651326772b40da593fac89902dc01ca116ba4573c4a5fde630b7",
+      "caffeineai-stripe@0.1.1/rules/create-checkout-session.toml": "194fe134e6cc3b1d2932482ff4d5f851894594df14fb69cd516f8d3a18d46b5b"
+    },
+    "caffeineai-http-outcalls@0.1.1": {
+      "caffeineai-http-outcalls@0.1.1/mops.toml": "412e8919376cb4b2260c2bb830dc44a7c9092271b1082469da30f445d6e40e00",
+      "caffeineai-http-outcalls@0.1.1/README.md": "c8dd0ee7548ac60f5c82c6f5f0a517bbcb847e1e876b71351a5b174b9a46a3fd",
+      "caffeineai-http-outcalls@0.1.1/src/outcall.mo": "f5e1eec3b12a04244856f99358e8766a2b5eedc0bf8d9abbebe372c1a3eaca58"
     }
   }
 }

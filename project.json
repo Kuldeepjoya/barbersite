@@ -1,25 +1,22 @@
 {
-  "overview": "A professional website for Master Deepak Hair Expert (Deepak Sen) — a leading Indian hair education brand. Features dark dramatic aesthetics with gold accents, services showcase, Instagram gallery, YouTube channel integration, academy courses, and appointment booking.",
+  "overview": "Master Deepak Hair Expert — a professional salon website with online booking, multi-service selection, Stripe-hosted payment, and an admin dashboard for managing appointments and payment status.",
   "features": [
-    "Bold brand hero with 'Cut, Color & Chemical' tagline",
-    "Services showcase — Butterfly, Wolf, Signature haircuts, Color & Chemical",
-    "Instagram-style photo gallery grid",
-    "YouTube channel section with 219K subscriber count",
-    "Academy courses listing with WhatsApp enrollment",
-    "Appointment booking form",
-    "Contact info with tap-to-call and WhatsApp links",
-    "Dark dramatic aesthetic — charcoal, gold, red"
+    "Multi-service checkbox booking form with instant total calculation",
+    "Stripe-hosted checkout — customers pay securely before booking is confirmed",
+    "Booking created only after payment confirmed — time slots stay open until payment succeeds",
+    "Customer confirmation screen with unique booking reference code",
+    "Admin dashboard with Today, Past, and Future Bookings tabs showing payment status",
+    "Manual payment override toggle for admin corrections",
+    "Double-booking prevention enforced at payment confirmation"
   ],
-  "category": "professional-services",
+  "category": "productivity",
   "tags": [
-    "hair",
     "salon",
-    "barber",
-    "beauty",
-    "education",
-    "academy",
-    "india",
-    "professional"
+    "booking",
+    "stripe",
+    "payments",
+    "admin-dashboard",
+    "hair-expert"
   ],
-  "last_updated": "2026-04-10T17:30:41.756Z"
+  "last_updated": "2026-04-29T02:43:55.952Z"
 }

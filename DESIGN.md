@@ -68,3 +68,65 @@ Bold, dramatic, high-contrast masculine energy with Indian salon authority. Gold
 
 ## Signature Detail
 Deep charcoal + vibrant gold + high-contrast white = theatrical luxury barber energy. Every CTA burns. Gold glow on cards creates premium aura without gimmickry.
+
+---
+
+# Admin Dashboard Design
+
+## Purpose
+Internal management interface for admin (owner) to view bookings, toggle payment status, track customer details, prevent double bookings, and manage booking reference codes. Accessible via secret URL only.
+
+## Tone & Differentiation
+Data-focused, minimal decoration. Inherits premium salon aesthetic but prioritizes information clarity and rapid admin workflows. No theatrical elements—pure function within trusted brand context.
+
+## Palette (inherited from main site)
+Reuses all existing OKLCH tokens: warm off-white background, deep charcoal foreground, gold accent, destructive red. No new colors.
+
+## Typography
+- Display: Fraunces (section titles, dashboard header)
+- Body: Satoshi (labels, customer info, descriptions)
+- Mono: Geist Mono (booking reference codes for copyability)
+
+## Structural Zones (Admin Dashboard)
+
+| Zone | Styling | Purpose |
+| --- | --- | --- |
+| Sidebar | `bg-sidebar` white, `border-r border-sidebar-border`, nav links with gold active state | Navigation: Today, Past, Payment tracking, Logout |
+| Header | `bg-card border-b`, admin email display, logout button | Quick navigation and session status |
+| Today's Bookings | `bg-background` with `.admin-booking-card` grid (2–3 cols), sorted by time | Primary workflow—all today's appointments |
+| Booking Card | `.admin-booking-card` with customer name, email, contact, time, reference code (mono), payment toggle | Single appointment data + quick actions |
+| Payment Toggle | Simple checkbox input, `.admin-toggle-paid`, paired with `.admin-status-badge` (paid/unpaid visual) | Quick paid/unpaid switching without form |
+| Reference Code | `.admin-reference-code` monospace display, easily copyable | Unique identifier per booking |
+| Past Bookings | Secondary section with date range filter, expandable list or table view | Historical data retrieval by date |
+| Footer | Minimal text-only, copyright | Internal tool—no social links |
+
+## Component Patterns
+
+| Pattern | Treatment |
+| --- | --- |
+| Sidebar nav link | Satoshi body, gray hover state, gold underline + bold on active |
+| Booking card | White card, subtle shadow, time + name + email + contact + reference code + toggle |
+| Payment toggle | Checkbox with accent color, paired badge (green "Paid" / red "Unpaid") |
+| Reference code | Geist Mono `text-xs`, muted gray bg, rounded px, easily distinguishable |
+| Filter button | `.btn-secondary` style for past bookings date range |
+| Date input | `bg-muted/40 border border-accent/20`, inherit from main site form styling |
+
+## Information Density
+- No whitespace waste; compact but readable layout
+- Card-based today's bookings (visual chunking)
+- Table view for past bookings (high information density)
+- Status badges (color + text for redundancy)
+
+## Motion
+- Transitions: `.transition-smooth` (0.3s) on all interactive elements
+- Card hover: subtle shadow elevation
+- Toggle interaction: immediate visual feedback (checkbox checked state)
+- No animations—professional, data-focused environment
+
+## Constraints
+- Gold accent **only** on navigation active state, payment status, and CTA buttons—maintains main site consistency
+- Sidebar navigation always visible on desktop, collapsed on mobile
+- Booking reference codes never editable by admin (generated server-side)
+- Double-booking prevention: system prevents same time slot from being booked twice
+- Payment status: simple toggle (no amount or date entry per user preference)
+- Customer confirmation: booking reference code shown in confirmation message post-booking

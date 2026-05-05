@@ -7,8 +7,1392 @@ var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
 var _client, _currentQuery, _currentQueryInitialState, _currentResult, _currentResultState, _currentResultOptions, _currentThenable, _selectError, _selectFn, _selectResult, _lastQueryWithDefinedData, _staleTimeoutId, _refetchIntervalId, _currentRefetchInterval, _trackedProps, _QueryObserver_instances, executeFetch_fn, updateStaleTimeout_fn, computeRefetchInterval_fn, updateRefetchInterval_fn, updateTimers_fn, clearStaleTimeout_fn, clearRefetchInterval_fn, updateQuery_fn, notify_fn, _a, _client2, _currentResult2, _currentMutation, _mutateOptions, _MutationObserver_instances, updateResult_fn, notify_fn2, _b;
-import { S as Subscribable, p as pendingThenable, r as resolveEnabled, s as shallowEqualObjects, a as resolveStaleTime, n as noop, e as environmentManager, i as isValidTimeout, t as timeUntilStale, b as timeoutManager, f as focusManager, c as fetchState, d as replaceData, g as notifyManager, h as hashKey, k as getDefaultState, l as reactExports, m as shouldThrowError, u as useQueryClient, j as jsxRuntimeExports, R as React } from "./index-DJRfP8fw.js";
-import { c as createLucideIcon, L as Layout, m as motion, S as Scissors } from "./proxy-ChzV7Zov.js";
+import { l as lebEncode, d as concat, s as slebEncode, e as lebDecode, f as safeRead, g as safeReadUint8, P as PipeArrayBuffer, i as iexp2, w as writeUIntLE, h as readUIntLE, k as writeIntLE, m as readIntLE, n as Principal, o as slebDecode, p as uint8ToDataView, S as Subscribable, q as pendingThenable, t as resolveEnabled, v as shallowEqualObjects, x as resolveStaleTime, y as noop, z as environmentManager, A as isValidTimeout, B as timeUntilStale, C as timeoutManager, D as focusManager, E as fetchState, F as replaceData, G as notifyManager, H as hashKey, I as getDefaultState, r as reactExports, J as shouldThrowError, b as useQueryClient, j as jsxRuntimeExports } from "./index-hUMo4Dx_.js";
+import { c as createLucideIcon } from "./scissors-nS2oxIpE.js";
+function idlHash(s) {
+  const utf8encoder = new TextEncoder();
+  const array = utf8encoder.encode(s);
+  let h = 0;
+  for (const c of array) {
+    h = (h * 223 + c) % 2 ** 32;
+  }
+  return h;
+}
+function idlLabelToId(label) {
+  if (/^_\d+_$/.test(label) || /^_0x[0-9a-fA-F]+_$/.test(label)) {
+    const num = +label.slice(1, -1);
+    if (Number.isSafeInteger(num) && num >= 0 && num < 2 ** 32) {
+      return num;
+    }
+  }
+  return idlHash(label);
+}
+var IDLTypeIds;
+(function(IDLTypeIds2) {
+  IDLTypeIds2[IDLTypeIds2["Null"] = -1] = "Null";
+  IDLTypeIds2[IDLTypeIds2["Bool"] = -2] = "Bool";
+  IDLTypeIds2[IDLTypeIds2["Nat"] = -3] = "Nat";
+  IDLTypeIds2[IDLTypeIds2["Int"] = -4] = "Int";
+  IDLTypeIds2[IDLTypeIds2["Float32"] = -13] = "Float32";
+  IDLTypeIds2[IDLTypeIds2["Float64"] = -14] = "Float64";
+  IDLTypeIds2[IDLTypeIds2["Text"] = -15] = "Text";
+  IDLTypeIds2[IDLTypeIds2["Reserved"] = -16] = "Reserved";
+  IDLTypeIds2[IDLTypeIds2["Empty"] = -17] = "Empty";
+  IDLTypeIds2[IDLTypeIds2["Opt"] = -18] = "Opt";
+  IDLTypeIds2[IDLTypeIds2["Vector"] = -19] = "Vector";
+  IDLTypeIds2[IDLTypeIds2["Record"] = -20] = "Record";
+  IDLTypeIds2[IDLTypeIds2["Variant"] = -21] = "Variant";
+  IDLTypeIds2[IDLTypeIds2["Func"] = -22] = "Func";
+  IDLTypeIds2[IDLTypeIds2["Service"] = -23] = "Service";
+  IDLTypeIds2[IDLTypeIds2["Principal"] = -24] = "Principal";
+})(IDLTypeIds || (IDLTypeIds = {}));
+const toReadableString_max = 400;
+function zipWith(xs, ys, f) {
+  return xs.map((x, i) => f(x, ys[i]));
+}
+var IdlTypeName;
+(function(IdlTypeName2) {
+  IdlTypeName2["EmptyClass"] = "__IDL_EmptyClass__";
+  IdlTypeName2["UnknownClass"] = "__IDL_UnknownClass__";
+  IdlTypeName2["BoolClass"] = "__IDL_BoolClass__";
+  IdlTypeName2["NullClass"] = "__IDL_NullClass__";
+  IdlTypeName2["ReservedClass"] = "__IDL_ReservedClass__";
+  IdlTypeName2["TextClass"] = "__IDL_TextClass__";
+  IdlTypeName2["IntClass"] = "__IDL_IntClass__";
+  IdlTypeName2["NatClass"] = "__IDL_NatClass__";
+  IdlTypeName2["FloatClass"] = "__IDL_FloatClass__";
+  IdlTypeName2["FixedIntClass"] = "__IDL_FixedIntClass__";
+  IdlTypeName2["FixedNatClass"] = "__IDL_FixedNatClass__";
+  IdlTypeName2["VecClass"] = "__IDL_VecClass__";
+  IdlTypeName2["OptClass"] = "__IDL_OptClass__";
+  IdlTypeName2["RecordClass"] = "__IDL_RecordClass__";
+  IdlTypeName2["TupleClass"] = "__IDL_TupleClass__";
+  IdlTypeName2["VariantClass"] = "__IDL_VariantClass__";
+  IdlTypeName2["RecClass"] = "__IDL_RecClass__";
+  IdlTypeName2["PrincipalClass"] = "__IDL_PrincipalClass__";
+  IdlTypeName2["FuncClass"] = "__IDL_FuncClass__";
+  IdlTypeName2["ServiceClass"] = "__IDL_ServiceClass__";
+})(IdlTypeName || (IdlTypeName = {}));
+class Type {
+  /* Display type name */
+  display() {
+    return this.name;
+  }
+  valueToString(x) {
+    return toReadableString(x);
+  }
+  /* Implement `T` in the IDL spec, only needed for non-primitive types */
+  buildTypeTable(typeTable) {
+    if (!typeTable.has(this)) {
+      this._buildTypeTableImpl(typeTable);
+    }
+  }
+}
+class PrimitiveType extends Type {
+  checkType(t) {
+    if (this.name !== t.name) {
+      throw new Error(`type mismatch: type on the wire ${t.name}, expect type ${this.name}`);
+    }
+    return t;
+  }
+  _buildTypeTableImpl(_typeTable) {
+    return;
+  }
+}
+class ConstructType extends Type {
+  checkType(t) {
+    if (t instanceof RecClass) {
+      const ty = t.getType();
+      if (typeof ty === "undefined") {
+        throw new Error("type mismatch with uninitialized type");
+      }
+      return ty;
+    }
+    throw new Error(`type mismatch: type on the wire ${t.name}, expect type ${this.name}`);
+  }
+  encodeType(typeTable) {
+    return typeTable.indexOf(this.name);
+  }
+}
+class EmptyClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.EmptyClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.EmptyClass;
+  }
+  accept(v, d) {
+    return v.visitEmpty(this, d);
+  }
+  covariant(x) {
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue() {
+    throw new Error("Empty cannot appear as a function argument");
+  }
+  valueToString() {
+    throw new Error("Empty cannot appear as a value");
+  }
+  encodeType() {
+    return slebEncode(IDLTypeIds.Empty);
+  }
+  decodeValue() {
+    throw new Error("Empty cannot appear as an output");
+  }
+  get name() {
+    return "empty";
+  }
+}
+class BoolClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.BoolClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.BoolClass;
+  }
+  accept(v, d) {
+    return v.visitBool(this, d);
+  }
+  covariant(x) {
+    if (typeof x === "boolean")
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    return new Uint8Array([x ? 1 : 0]);
+  }
+  encodeType() {
+    return slebEncode(IDLTypeIds.Bool);
+  }
+  decodeValue(b, t) {
+    this.checkType(t);
+    switch (safeReadUint8(b)) {
+      case 0:
+        return false;
+      case 1:
+        return true;
+      default:
+        throw new Error("Boolean value out of range");
+    }
+  }
+  get name() {
+    return "bool";
+  }
+}
+class NullClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.NullClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.NullClass;
+  }
+  accept(v, d) {
+    return v.visitNull(this, d);
+  }
+  covariant(x) {
+    if (x === null)
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue() {
+    return new Uint8Array(0);
+  }
+  encodeType() {
+    return slebEncode(IDLTypeIds.Null);
+  }
+  decodeValue(_b2, t) {
+    this.checkType(t);
+    return null;
+  }
+  get name() {
+    return "null";
+  }
+}
+class ReservedClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.ReservedClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.ReservedClass;
+  }
+  accept(v, d) {
+    return v.visitReserved(this, d);
+  }
+  covariant(_x) {
+    return true;
+  }
+  encodeValue() {
+    return new Uint8Array(0);
+  }
+  encodeType() {
+    return slebEncode(IDLTypeIds.Reserved);
+  }
+  decodeValue(b, t) {
+    if (t.name !== this.name) {
+      t.decodeValue(b, t);
+    }
+    return null;
+  }
+  get name() {
+    return "reserved";
+  }
+}
+class TextClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.TextClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.TextClass;
+  }
+  accept(v, d) {
+    return v.visitText(this, d);
+  }
+  covariant(x) {
+    if (typeof x === "string")
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    const buf = new TextEncoder().encode(x);
+    const len = lebEncode(buf.byteLength);
+    return concat(len, buf);
+  }
+  encodeType() {
+    return slebEncode(IDLTypeIds.Text);
+  }
+  decodeValue(b, t) {
+    this.checkType(t);
+    const len = lebDecode(b);
+    const buf = safeRead(b, Number(len));
+    const decoder = new TextDecoder("utf8", { fatal: true });
+    return decoder.decode(buf);
+  }
+  get name() {
+    return "text";
+  }
+  valueToString(x) {
+    return '"' + x + '"';
+  }
+}
+class IntClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.IntClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.IntClass;
+  }
+  accept(v, d) {
+    return v.visitInt(this, d);
+  }
+  covariant(x) {
+    if (typeof x === "bigint" || Number.isInteger(x))
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    return slebEncode(x);
+  }
+  encodeType() {
+    return slebEncode(IDLTypeIds.Int);
+  }
+  decodeValue(b, t) {
+    this.checkType(t);
+    return slebDecode(b);
+  }
+  get name() {
+    return "int";
+  }
+  valueToString(x) {
+    return x.toString();
+  }
+}
+class NatClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.NatClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.NatClass;
+  }
+  accept(v, d) {
+    return v.visitNat(this, d);
+  }
+  covariant(x) {
+    if (typeof x === "bigint" && x >= BigInt(0) || Number.isInteger(x) && x >= 0)
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    return lebEncode(x);
+  }
+  encodeType() {
+    return slebEncode(IDLTypeIds.Nat);
+  }
+  decodeValue(b, t) {
+    this.checkType(t);
+    return lebDecode(b);
+  }
+  get name() {
+    return "nat";
+  }
+  valueToString(x) {
+    return x.toString();
+  }
+}
+class FloatClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.FloatClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.FloatClass;
+  }
+  constructor(_bits) {
+    super();
+    this._bits = _bits;
+    if (_bits !== 32 && _bits !== 64) {
+      throw new Error("not a valid float type");
+    }
+  }
+  accept(v, d) {
+    return v.visitFloat(this, d);
+  }
+  covariant(x) {
+    if (typeof x === "number" || x instanceof Number)
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    const buf = new ArrayBuffer(this._bits / 8);
+    const view = new DataView(buf);
+    if (this._bits === 32) {
+      view.setFloat32(0, x, true);
+    } else {
+      view.setFloat64(0, x, true);
+    }
+    return new Uint8Array(buf);
+  }
+  encodeType() {
+    const opcode = this._bits === 32 ? IDLTypeIds.Float32 : IDLTypeIds.Float64;
+    return slebEncode(opcode);
+  }
+  decodeValue(b, t) {
+    this.checkType(t);
+    const bytes = safeRead(b, this._bits / 8);
+    const view = uint8ToDataView(bytes);
+    if (this._bits === 32) {
+      return view.getFloat32(0, true);
+    } else {
+      return view.getFloat64(0, true);
+    }
+  }
+  get name() {
+    return "float" + this._bits;
+  }
+  valueToString(x) {
+    return x.toString();
+  }
+}
+class FixedIntClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.FixedIntClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.FixedIntClass;
+  }
+  constructor(_bits) {
+    super();
+    this._bits = _bits;
+  }
+  accept(v, d) {
+    return v.visitFixedInt(this, d);
+  }
+  covariant(x) {
+    const min = iexp2(this._bits - 1) * BigInt(-1);
+    const max = iexp2(this._bits - 1) - BigInt(1);
+    let ok = false;
+    if (typeof x === "bigint") {
+      ok = x >= min && x <= max;
+    } else if (Number.isInteger(x)) {
+      const v = BigInt(x);
+      ok = v >= min && v <= max;
+    } else {
+      ok = false;
+    }
+    if (ok)
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    return writeIntLE(x, this._bits / 8);
+  }
+  encodeType() {
+    const offset = Math.log2(this._bits) - 3;
+    return slebEncode(-9 - offset);
+  }
+  decodeValue(b, t) {
+    this.checkType(t);
+    const num = readIntLE(b, this._bits / 8);
+    if (this._bits <= 32) {
+      return Number(num);
+    } else {
+      return num;
+    }
+  }
+  get name() {
+    return `int${this._bits}`;
+  }
+  valueToString(x) {
+    return x.toString();
+  }
+}
+class FixedNatClass extends PrimitiveType {
+  get typeName() {
+    return IdlTypeName.FixedNatClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.FixedNatClass;
+  }
+  constructor(_bits) {
+    super();
+    this._bits = _bits;
+  }
+  accept(v, d) {
+    return v.visitFixedNat(this, d);
+  }
+  covariant(x) {
+    const max = iexp2(this._bits);
+    let ok = false;
+    if (typeof x === "bigint" && x >= BigInt(0)) {
+      ok = x < max;
+    } else if (Number.isInteger(x) && x >= 0) {
+      const v = BigInt(x);
+      ok = v < max;
+    } else {
+      ok = false;
+    }
+    if (ok)
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    return writeUIntLE(x, this._bits / 8);
+  }
+  encodeType() {
+    const offset = Math.log2(this._bits) - 3;
+    return slebEncode(-5 - offset);
+  }
+  decodeValue(b, t) {
+    this.checkType(t);
+    const num = readUIntLE(b, this._bits / 8);
+    if (this._bits <= 32) {
+      return Number(num);
+    } else {
+      return num;
+    }
+  }
+  get name() {
+    return `nat${this._bits}`;
+  }
+  valueToString(x) {
+    return x.toString();
+  }
+}
+class VecClass extends ConstructType {
+  get typeName() {
+    return IdlTypeName.VecClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.VecClass;
+  }
+  constructor(_type) {
+    super();
+    this._type = _type;
+    this._blobOptimization = false;
+    if (_type instanceof FixedNatClass && _type._bits === 8) {
+      this._blobOptimization = true;
+    }
+  }
+  accept(v, d) {
+    return v.visitVec(this, this._type, d);
+  }
+  covariant(x) {
+    const bits = this._type instanceof FixedNatClass ? this._type._bits : this._type instanceof FixedIntClass ? this._type._bits : 0;
+    if (ArrayBuffer.isView(x) && bits == x.BYTES_PER_ELEMENT * 8 || Array.isArray(x) && x.every((v, idx) => {
+      try {
+        return this._type.covariant(v);
+      } catch (e) {
+        throw new Error(`Invalid ${this.display()} argument: 
+
+index ${idx} -> ${e.message}`);
+      }
+    }))
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    const len = lebEncode(x.length);
+    if (this._blobOptimization) {
+      return concat(len, new Uint8Array(x));
+    }
+    if (ArrayBuffer.isView(x)) {
+      if (x instanceof Int16Array || x instanceof Uint16Array) {
+        const buffer = new DataView(new ArrayBuffer(x.length * 2));
+        for (let i = 0; i < x.length; i++) {
+          if (x instanceof Int16Array) {
+            buffer.setInt16(i * 2, x[i], true);
+          } else {
+            buffer.setUint16(i * 2, x[i], true);
+          }
+        }
+        return concat(len, new Uint8Array(buffer.buffer));
+      } else if (x instanceof Int32Array || x instanceof Uint32Array) {
+        const buffer = new DataView(new ArrayBuffer(x.length * 4));
+        for (let i = 0; i < x.length; i++) {
+          if (x instanceof Int32Array) {
+            buffer.setInt32(i * 4, x[i], true);
+          } else {
+            buffer.setUint32(i * 4, x[i], true);
+          }
+        }
+        return concat(len, new Uint8Array(buffer.buffer));
+      } else if (x instanceof BigInt64Array || x instanceof BigUint64Array) {
+        const buffer = new DataView(new ArrayBuffer(x.length * 8));
+        for (let i = 0; i < x.length; i++) {
+          if (x instanceof BigInt64Array) {
+            buffer.setBigInt64(i * 8, x[i], true);
+          } else {
+            buffer.setBigUint64(i * 8, x[i], true);
+          }
+        }
+        return concat(len, new Uint8Array(buffer.buffer));
+      } else {
+        return concat(len, new Uint8Array(x.buffer, x.byteOffset, x.byteLength));
+      }
+    }
+    const buf = new PipeArrayBuffer(new Uint8Array(len.byteLength + x.length), 0);
+    buf.write(len);
+    for (const d of x) {
+      const encoded = this._type.encodeValue(d);
+      buf.write(new Uint8Array(encoded));
+    }
+    return buf.buffer;
+  }
+  _buildTypeTableImpl(typeTable) {
+    this._type.buildTypeTable(typeTable);
+    const opCode = slebEncode(IDLTypeIds.Vector);
+    const buffer = this._type.encodeType(typeTable);
+    typeTable.add(this, concat(opCode, buffer));
+  }
+  decodeValue(b, t) {
+    const vec = this.checkType(t);
+    if (!(vec instanceof VecClass)) {
+      throw new Error("Not a vector type");
+    }
+    const len = Number(lebDecode(b));
+    if (this._type instanceof FixedNatClass) {
+      if (this._type._bits == 8) {
+        return new Uint8Array(b.read(len));
+      }
+      if (this._type._bits == 16) {
+        const bytes = b.read(len * 2);
+        const u16 = new Uint16Array(bytes.buffer, bytes.byteOffset, len);
+        return u16;
+      }
+      if (this._type._bits == 32) {
+        const bytes = b.read(len * 4);
+        const u32 = new Uint32Array(bytes.buffer, bytes.byteOffset, len);
+        return u32;
+      }
+      if (this._type._bits == 64) {
+        return new BigUint64Array(b.read(len * 8).buffer);
+      }
+    }
+    if (this._type instanceof FixedIntClass) {
+      if (this._type._bits == 8) {
+        return new Int8Array(b.read(len));
+      }
+      if (this._type._bits == 16) {
+        const bytes = b.read(len * 2);
+        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        const result = new Int16Array(len);
+        for (let i = 0; i < len; i++) {
+          result[i] = view.getInt16(i * 2, true);
+        }
+        return result;
+      }
+      if (this._type._bits == 32) {
+        const bytes = b.read(len * 4);
+        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        const result = new Int32Array(len);
+        for (let i = 0; i < len; i++) {
+          result[i] = view.getInt32(i * 4, true);
+        }
+        return result;
+      }
+      if (this._type._bits == 64) {
+        const bytes = b.read(len * 8);
+        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        const result = new BigInt64Array(len);
+        for (let i = 0; i < len; i++) {
+          result[i] = view.getBigInt64(i * 8, true);
+        }
+        return result;
+      }
+    }
+    const rets = [];
+    for (let i = 0; i < len; i++) {
+      rets.push(this._type.decodeValue(b, vec._type));
+    }
+    return rets;
+  }
+  get name() {
+    return `vec ${this._type.name}`;
+  }
+  display() {
+    return `vec ${this._type.display()}`;
+  }
+  valueToString(x) {
+    const elements = x.map((e) => this._type.valueToString(e));
+    return "vec {" + elements.join("; ") + "}";
+  }
+}
+class OptClass extends ConstructType {
+  get typeName() {
+    return IdlTypeName.OptClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.OptClass;
+  }
+  constructor(_type) {
+    super();
+    this._type = _type;
+  }
+  accept(v, d) {
+    return v.visitOpt(this, this._type, d);
+  }
+  covariant(x) {
+    try {
+      if (Array.isArray(x) && (x.length === 0 || x.length === 1 && this._type.covariant(x[0])))
+        return true;
+    } catch (e) {
+      throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)} 
+
+-> ${e.message}`);
+    }
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    if (x.length === 0) {
+      return new Uint8Array([0]);
+    } else {
+      return concat(new Uint8Array([1]), this._type.encodeValue(x[0]));
+    }
+  }
+  _buildTypeTableImpl(typeTable) {
+    this._type.buildTypeTable(typeTable);
+    const opCode = slebEncode(IDLTypeIds.Opt);
+    const buffer = this._type.encodeType(typeTable);
+    typeTable.add(this, concat(opCode, buffer));
+  }
+  decodeValue(b, t) {
+    if (t instanceof NullClass) {
+      return [];
+    }
+    if (t instanceof ReservedClass) {
+      return [];
+    }
+    let wireType = t;
+    if (t instanceof RecClass) {
+      const ty = t.getType();
+      if (typeof ty === "undefined") {
+        throw new Error("type mismatch with uninitialized type");
+      } else
+        wireType = ty;
+    }
+    if (wireType instanceof OptClass) {
+      switch (safeReadUint8(b)) {
+        case 0:
+          return [];
+        case 1: {
+          const checkpoint = b.save();
+          try {
+            const v = this._type.decodeValue(b, wireType._type);
+            return [v];
+          } catch (e) {
+            b.restore(checkpoint);
+            wireType._type.decodeValue(b, wireType._type);
+            return [];
+          }
+        }
+        default:
+          throw new Error("Not an option value");
+      }
+    } else if (
+      // this check corresponds to `not (null <: <t>)` in the spec
+      this._type instanceof NullClass || this._type instanceof OptClass || this._type instanceof ReservedClass
+    ) {
+      wireType.decodeValue(b, wireType);
+      return [];
+    } else {
+      const checkpoint = b.save();
+      try {
+        const v = this._type.decodeValue(b, t);
+        return [v];
+      } catch (e) {
+        b.restore(checkpoint);
+        wireType.decodeValue(b, t);
+        return [];
+      }
+    }
+  }
+  get name() {
+    return `opt ${this._type.name}`;
+  }
+  display() {
+    return `opt ${this._type.display()}`;
+  }
+  valueToString(x) {
+    if (x.length === 0) {
+      return "null";
+    } else {
+      return `opt ${this._type.valueToString(x[0])}`;
+    }
+  }
+}
+class RecordClass extends ConstructType {
+  get typeName() {
+    return IdlTypeName.RecordClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.RecordClass || instance.typeName === IdlTypeName.TupleClass;
+  }
+  constructor(fields = {}) {
+    super();
+    this._fields = Object.entries(fields).sort((a, b) => idlLabelToId(a[0]) - idlLabelToId(b[0]));
+  }
+  accept(v, d) {
+    return v.visitRecord(this, this._fields, d);
+  }
+  tryAsTuple() {
+    const res = [];
+    for (let i = 0; i < this._fields.length; i++) {
+      const [key, type] = this._fields[i];
+      if (key !== `_${i}_`) {
+        return null;
+      }
+      res.push(type);
+    }
+    return res;
+  }
+  covariant(x) {
+    if (typeof x === "object" && this._fields.every(([k, t]) => {
+      if (!x.hasOwnProperty(k)) {
+        throw new Error(`Record is missing key "${k}".`);
+      }
+      try {
+        return t.covariant(x[k]);
+      } catch (e) {
+        throw new Error(`Invalid ${this.display()} argument: 
+
+field ${k} -> ${e.message}`);
+      }
+    }))
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    const values = this._fields.map(([key]) => x[key]);
+    const bufs = zipWith(this._fields, values, ([, c], d) => c.encodeValue(d));
+    return concat(...bufs);
+  }
+  _buildTypeTableImpl(T) {
+    this._fields.forEach(([_, value]) => value.buildTypeTable(T));
+    const opCode = slebEncode(IDLTypeIds.Record);
+    const len = lebEncode(this._fields.length);
+    const fields = this._fields.map(([key, value]) => concat(lebEncode(idlLabelToId(key)), value.encodeType(T)));
+    T.add(this, concat(opCode, len, concat(...fields)));
+  }
+  decodeValue(b, t) {
+    const record = this.checkType(t);
+    if (!(record instanceof RecordClass)) {
+      throw new Error("Not a record type");
+    }
+    const x = {};
+    let expectedRecordIdx = 0;
+    let actualRecordIdx = 0;
+    while (actualRecordIdx < record._fields.length) {
+      const [hash, type] = record._fields[actualRecordIdx];
+      if (expectedRecordIdx >= this._fields.length) {
+        type.decodeValue(b, type);
+        actualRecordIdx++;
+        continue;
+      }
+      const [expectKey, expectType] = this._fields[expectedRecordIdx];
+      const expectedId = idlLabelToId(this._fields[expectedRecordIdx][0]);
+      const actualId = idlLabelToId(hash);
+      if (expectedId === actualId) {
+        x[expectKey] = expectType.decodeValue(b, type);
+        expectedRecordIdx++;
+        actualRecordIdx++;
+      } else if (actualId > expectedId) {
+        if (expectType instanceof OptClass || expectType instanceof ReservedClass) {
+          x[expectKey] = [];
+          expectedRecordIdx++;
+        } else {
+          throw new Error("Cannot find required field " + expectKey);
+        }
+      } else {
+        type.decodeValue(b, type);
+        actualRecordIdx++;
+      }
+    }
+    for (const [expectKey, expectType] of this._fields.slice(expectedRecordIdx)) {
+      if (expectType instanceof OptClass || expectType instanceof ReservedClass) {
+        x[expectKey] = [];
+      } else {
+        throw new Error("Cannot find required field " + expectKey);
+      }
+    }
+    return x;
+  }
+  get fieldsAsObject() {
+    const fields = {};
+    for (const [name, ty] of this._fields) {
+      fields[idlLabelToId(name)] = ty;
+    }
+    return fields;
+  }
+  get name() {
+    const fields = this._fields.map(([key, value]) => key + ":" + value.name);
+    return `record {${fields.join("; ")}}`;
+  }
+  display() {
+    const fields = this._fields.map(([key, value]) => key + ":" + value.display());
+    return `record {${fields.join("; ")}}`;
+  }
+  valueToString(x) {
+    const values = this._fields.map(([key]) => x[key]);
+    const fields = zipWith(this._fields, values, ([k, c], d) => k + "=" + c.valueToString(d));
+    return `record {${fields.join("; ")}}`;
+  }
+}
+class VariantClass extends ConstructType {
+  get typeName() {
+    return IdlTypeName.VariantClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.VariantClass;
+  }
+  constructor(fields = {}) {
+    super();
+    this._fields = Object.entries(fields).sort((a, b) => idlLabelToId(a[0]) - idlLabelToId(b[0]));
+  }
+  accept(v, d) {
+    return v.visitVariant(this, this._fields, d);
+  }
+  covariant(x) {
+    if (typeof x === "object" && Object.entries(x).length === 1 && this._fields.every(([k, v]) => {
+      try {
+        return !x.hasOwnProperty(k) || v.covariant(x[k]);
+      } catch (e) {
+        throw new Error(`Invalid ${this.display()} argument: 
+
+variant ${k} -> ${e.message}`);
+      }
+    }))
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    for (let i = 0; i < this._fields.length; i++) {
+      const [name, type] = this._fields[i];
+      if (x.hasOwnProperty(name)) {
+        const idx = lebEncode(i);
+        const buf = type.encodeValue(x[name]);
+        return concat(idx, buf);
+      }
+    }
+    throw Error("Variant has no data: " + x);
+  }
+  _buildTypeTableImpl(typeTable) {
+    this._fields.forEach(([, type]) => {
+      type.buildTypeTable(typeTable);
+    });
+    const opCode = slebEncode(IDLTypeIds.Variant);
+    const len = lebEncode(this._fields.length);
+    const fields = this._fields.map(([key, value]) => concat(lebEncode(idlLabelToId(key)), value.encodeType(typeTable)));
+    typeTable.add(this, concat(opCode, len, ...fields));
+  }
+  decodeValue(b, t) {
+    const variant = this.checkType(t);
+    if (!(variant instanceof VariantClass)) {
+      throw new Error("Not a variant type");
+    }
+    const idx = Number(lebDecode(b));
+    if (idx >= variant._fields.length) {
+      throw Error("Invalid variant index: " + idx);
+    }
+    const [wireHash, wireType] = variant._fields[idx];
+    for (const [key, expectType] of this._fields) {
+      if (idlLabelToId(wireHash) === idlLabelToId(key)) {
+        const value = expectType.decodeValue(b, wireType);
+        return { [key]: value };
+      }
+    }
+    throw new Error("Cannot find field hash " + wireHash);
+  }
+  get name() {
+    const fields = this._fields.map(([key, type]) => key + ":" + type.name);
+    return `variant {${fields.join("; ")}}`;
+  }
+  display() {
+    const fields = this._fields.map(([key, type]) => key + (type.name === "null" ? "" : `:${type.display()}`));
+    return `variant {${fields.join("; ")}}`;
+  }
+  valueToString(x) {
+    for (const [name, type] of this._fields) {
+      if (x.hasOwnProperty(name)) {
+        const value = type.valueToString(x[name]);
+        if (value === "null") {
+          return `variant {${name}}`;
+        } else {
+          return `variant {${name}=${value}}`;
+        }
+      }
+    }
+    throw new Error("Variant has no data: " + x);
+  }
+  get alternativesAsObject() {
+    const alternatives = {};
+    for (const [name, ty] of this._fields) {
+      alternatives[idlLabelToId(name)] = ty;
+    }
+    return alternatives;
+  }
+}
+const _RecClass = class _RecClass extends ConstructType {
+  constructor() {
+    super(...arguments);
+    this._id = _RecClass._counter++;
+  }
+  get typeName() {
+    return IdlTypeName.RecClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.RecClass;
+  }
+  accept(v, d) {
+    if (!this._type) {
+      throw Error("Recursive type uninitialized.");
+    }
+    return v.visitRec(this, this._type, d);
+  }
+  fill(t) {
+    this._type = t;
+  }
+  getType() {
+    return this._type;
+  }
+  covariant(x) {
+    if (this._type ? this._type.covariant(x) : false)
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    if (!this._type) {
+      throw Error("Recursive type uninitialized.");
+    }
+    return this._type.encodeValue(x);
+  }
+  _buildTypeTableImpl(typeTable) {
+    if (!this._type) {
+      throw Error("Recursive type uninitialized.");
+    }
+    typeTable.add(this, new Uint8Array([]));
+    this._type.buildTypeTable(typeTable);
+    typeTable.merge(this, this._type.name);
+  }
+  decodeValue(b, t) {
+    if (!this._type) {
+      throw Error("Recursive type uninitialized.");
+    }
+    return this._type.decodeValue(b, t);
+  }
+  get name() {
+    return `rec_${this._id}`;
+  }
+  display() {
+    if (!this._type) {
+      throw Error("Recursive type uninitialized.");
+    }
+    return `μ${this.name}.${this._type.name}`;
+  }
+  valueToString(x) {
+    if (!this._type) {
+      throw Error("Recursive type uninitialized.");
+    }
+    return this._type.valueToString(x);
+  }
+};
+_RecClass._counter = 0;
+let RecClass = _RecClass;
+function decodePrincipalId(b) {
+  const x = safeReadUint8(b);
+  if (x !== 1) {
+    throw new Error("Cannot decode principal");
+  }
+  const len = Number(lebDecode(b));
+  return Principal.fromUint8Array(new Uint8Array(safeRead(b, len)));
+}
+class FuncClass extends ConstructType {
+  get typeName() {
+    return IdlTypeName.FuncClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.FuncClass;
+  }
+  static argsToString(types, v) {
+    if (types.length !== v.length) {
+      throw new Error("arity mismatch");
+    }
+    return "(" + types.map((t, i) => t.valueToString(v[i])).join(", ") + ")";
+  }
+  constructor(argTypes, retTypes, annotations = []) {
+    super();
+    this.argTypes = argTypes;
+    this.retTypes = retTypes;
+    this.annotations = annotations;
+  }
+  accept(v, d) {
+    return v.visitFunc(this, d);
+  }
+  covariant(x) {
+    if (Array.isArray(x) && x.length === 2 && x[0] && x[0]._isPrincipal && typeof x[1] === "string")
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue([principal, methodName]) {
+    const buf = principal.toUint8Array();
+    const len = lebEncode(buf.byteLength);
+    const canister = concat(new Uint8Array([1]), len, buf);
+    const method = new TextEncoder().encode(methodName);
+    const methodLen = lebEncode(method.byteLength);
+    return concat(new Uint8Array([1]), canister, methodLen, method);
+  }
+  _buildTypeTableImpl(T) {
+    this.argTypes.forEach((arg) => arg.buildTypeTable(T));
+    this.retTypes.forEach((arg) => arg.buildTypeTable(T));
+    const opCode = slebEncode(IDLTypeIds.Func);
+    const argLen = lebEncode(this.argTypes.length);
+    const args = concat(...this.argTypes.map((arg) => arg.encodeType(T)));
+    const retLen = lebEncode(this.retTypes.length);
+    const rets = concat(...this.retTypes.map((arg) => arg.encodeType(T)));
+    const annLen = lebEncode(this.annotations.length);
+    const anns = concat(...this.annotations.map((a) => this.encodeAnnotation(a)));
+    T.add(this, concat(opCode, argLen, args, retLen, rets, annLen, anns));
+  }
+  decodeValue(b, t) {
+    const tt = t instanceof RecClass ? t.getType() ?? t : t;
+    if (!subtype(tt, this)) {
+      throw new Error(`Cannot decode function reference at type ${this.display()} from wire type ${tt.display()}`);
+    }
+    const x = safeReadUint8(b);
+    if (x !== 1) {
+      throw new Error("Cannot decode function reference");
+    }
+    const canister = decodePrincipalId(b);
+    const mLen = Number(lebDecode(b));
+    const buf = safeRead(b, mLen);
+    const decoder = new TextDecoder("utf8", { fatal: true });
+    const method = decoder.decode(buf);
+    return [canister, method];
+  }
+  get name() {
+    const args = this.argTypes.map((arg) => arg.name).join(", ");
+    const rets = this.retTypes.map((arg) => arg.name).join(", ");
+    const annon = " " + this.annotations.join(" ");
+    return `(${args}) -> (${rets})${annon}`;
+  }
+  valueToString([principal, str]) {
+    return `func "${principal.toText()}".${str}`;
+  }
+  display() {
+    const args = this.argTypes.map((arg) => arg.display()).join(", ");
+    const rets = this.retTypes.map((arg) => arg.display()).join(", ");
+    const annon = " " + this.annotations.join(" ");
+    return `(${args}) → (${rets})${annon}`;
+  }
+  encodeAnnotation(ann) {
+    if (ann === "query") {
+      return new Uint8Array([1]);
+    } else if (ann === "oneway") {
+      return new Uint8Array([2]);
+    } else if (ann === "composite_query") {
+      return new Uint8Array([3]);
+    } else {
+      throw new Error("Illegal function annotation");
+    }
+  }
+}
+class ServiceClass extends ConstructType {
+  get typeName() {
+    return IdlTypeName.ServiceClass;
+  }
+  static [Symbol.hasInstance](instance) {
+    return instance.typeName === IdlTypeName.ServiceClass;
+  }
+  constructor(fields) {
+    super();
+    this._fields = Object.entries(fields).sort((a, b) => {
+      if (a[0] < b[0]) {
+        return -1;
+      }
+      if (a[0] > b[0]) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  accept(v, d) {
+    return v.visitService(this, d);
+  }
+  covariant(x) {
+    if (x && x._isPrincipal)
+      return true;
+    throw new Error(`Invalid ${this.display()} argument: ${toReadableString(x)}`);
+  }
+  encodeValue(x) {
+    const buf = x.toUint8Array();
+    const len = lebEncode(buf.length);
+    return concat(new Uint8Array([1]), len, buf);
+  }
+  _buildTypeTableImpl(T) {
+    this._fields.forEach(([_, func]) => func.buildTypeTable(T));
+    const opCode = slebEncode(IDLTypeIds.Service);
+    const len = lebEncode(this._fields.length);
+    const meths = this._fields.map(([label, func]) => {
+      const labelBuf = new TextEncoder().encode(label);
+      const labelLen = lebEncode(labelBuf.length);
+      return concat(labelLen, labelBuf, func.encodeType(T));
+    });
+    T.add(this, concat(opCode, len, ...meths));
+  }
+  decodeValue(b, t) {
+    const tt = t instanceof RecClass ? t.getType() ?? t : t;
+    if (!subtype(tt, this)) {
+      throw new Error(`Cannot decode service reference at type ${this.display()} from wire type ${tt.display()}`);
+    }
+    return decodePrincipalId(b);
+  }
+  get name() {
+    const fields = this._fields.map(([key, value]) => key + ":" + value.name);
+    return `service {${fields.join("; ")}}`;
+  }
+  valueToString(x) {
+    return `service "${x.toText()}"`;
+  }
+  fieldsAsObject() {
+    const fields = {};
+    for (const [name, ty] of this._fields) {
+      fields[name] = ty;
+    }
+    return fields;
+  }
+}
+function toReadableString(x) {
+  const str = JSON.stringify(x, (_key, value) => typeof value === "bigint" ? `BigInt(${value})` : value);
+  return str && str.length > toReadableString_max ? str.substring(0, toReadableString_max - 3) + "..." : str;
+}
+const Bool = new BoolClass();
+const Null = new NullClass();
+const Text = new TextClass();
+const Int = new IntClass();
+const Nat = new NatClass();
+new FloatClass(32);
+new FloatClass(64);
+new FixedIntClass(8);
+new FixedIntClass(16);
+new FixedIntClass(32);
+new FixedIntClass(64);
+const Nat8 = new FixedNatClass(8);
+new FixedNatClass(16);
+new FixedNatClass(32);
+new FixedNatClass(64);
+function Vec(t) {
+  return new VecClass(t);
+}
+function Opt(t) {
+  return new OptClass(t);
+}
+function Record(t) {
+  return new RecordClass(t);
+}
+function Variant(fields) {
+  return new VariantClass(fields);
+}
+function Func(args, ret, annotations = []) {
+  return new FuncClass(args, ret, annotations);
+}
+function Service$1(t) {
+  return new ServiceClass(t);
+}
+class Relations {
+  constructor(relations = /* @__PURE__ */ new Map()) {
+    this.rels = relations;
+  }
+  copy() {
+    const copy = /* @__PURE__ */ new Map();
+    for (const [key, value] of this.rels.entries()) {
+      const valCopy = new Map(value);
+      copy.set(key, valCopy);
+    }
+    return new Relations(copy);
+  }
+  /// Returns whether we know for sure that a relation holds or doesn't (`true` or `false`), or
+  /// if we don't know yet (`undefined`)
+  known(t1, t2) {
+    var _a2;
+    return (_a2 = this.rels.get(t1.name)) == null ? void 0 : _a2.get(t2.name);
+  }
+  addNegative(t1, t2) {
+    this.addNames(t1.name, t2.name, false);
+  }
+  add(t1, t2) {
+    this.addNames(t1.name, t2.name, true);
+  }
+  display() {
+    let result = "";
+    for (const [t1, v] of this.rels) {
+      for (const [t2, known] of v) {
+        const subty = known ? ":<" : "!<:";
+        result += `${t1} ${subty} ${t2}
+`;
+      }
+    }
+    return result;
+  }
+  addNames(t1, t2, isSubtype) {
+    const t1Map = this.rels.get(t1);
+    if (t1Map == void 0) {
+      const newMap = /* @__PURE__ */ new Map();
+      newMap.set(t2, isSubtype);
+      this.rels.set(t1, newMap);
+    } else {
+      t1Map.set(t2, isSubtype);
+    }
+  }
+}
+let subtypeCache = new Relations();
+function eqFunctionAnnotations(t1, t2) {
+  const t1Annotations = new Set(t1.annotations);
+  const t2Annotations = new Set(t2.annotations);
+  if (t1Annotations.size !== t2Annotations.size) {
+    return false;
+  }
+  for (const a of t1Annotations) {
+    if (!t2Annotations.has(a))
+      return false;
+  }
+  return true;
+}
+function canBeOmmitted(t) {
+  return t instanceof OptClass || t instanceof NullClass || t instanceof ReservedClass;
+}
+function subtype(t1, t2) {
+  const relations = subtypeCache.copy();
+  const isSubtype = subtype_(relations, t1, t2);
+  if (isSubtype) {
+    subtypeCache.add(t1, t2);
+  } else {
+    subtypeCache.addNegative(t1, t2);
+  }
+  return isSubtype;
+}
+function subtype_(relations, t1, t2) {
+  if (t1.name === t2.name)
+    return true;
+  const known = relations.known(t1, t2);
+  if (known !== void 0)
+    return known;
+  relations.add(t1, t2);
+  if (t2 instanceof ReservedClass)
+    return true;
+  if (t1 instanceof EmptyClass)
+    return true;
+  if (t1 instanceof NatClass && t2 instanceof IntClass)
+    return true;
+  if (t1 instanceof VecClass && t2 instanceof VecClass)
+    return subtype_(relations, t1._type, t2._type);
+  if (t2 instanceof OptClass)
+    return true;
+  if (t1 instanceof RecordClass && t2 instanceof RecordClass) {
+    const t1Object = t1.fieldsAsObject;
+    for (const [label, ty2] of t2._fields) {
+      const ty1 = t1Object[idlLabelToId(label)];
+      if (!ty1) {
+        if (!canBeOmmitted(ty2))
+          return false;
+      } else {
+        if (!subtype_(relations, ty1, ty2))
+          return false;
+      }
+    }
+    return true;
+  }
+  if (t1 instanceof FuncClass && t2 instanceof FuncClass) {
+    if (!eqFunctionAnnotations(t1, t2))
+      return false;
+    for (let i = 0; i < t1.argTypes.length; i++) {
+      const argTy1 = t1.argTypes[i];
+      if (i < t2.argTypes.length) {
+        if (!subtype_(relations, t2.argTypes[i], argTy1))
+          return false;
+      } else {
+        if (!canBeOmmitted(argTy1))
+          return false;
+      }
+    }
+    for (let i = 0; i < t2.retTypes.length; i++) {
+      const retTy2 = t2.retTypes[i];
+      if (i < t1.retTypes.length) {
+        if (!subtype_(relations, t1.retTypes[i], retTy2))
+          return false;
+      } else {
+        if (!canBeOmmitted(retTy2))
+          return false;
+      }
+    }
+    return true;
+  }
+  if (t1 instanceof VariantClass && t2 instanceof VariantClass) {
+    const t2Object = t2.alternativesAsObject;
+    for (const [label, ty1] of t1._fields) {
+      const ty2 = t2Object[idlLabelToId(label)];
+      if (!ty2)
+        return false;
+      if (!subtype_(relations, ty1, ty2))
+        return false;
+    }
+    return true;
+  }
+  if (t1 instanceof ServiceClass && t2 instanceof ServiceClass) {
+    const t1Object = t1.fieldsAsObject();
+    for (const [name, ty2] of t2._fields) {
+      const ty1 = t1Object[name];
+      if (!ty1)
+        return false;
+      if (!subtype_(relations, ty1, ty2))
+        return false;
+    }
+    return true;
+  }
+  if (t1 instanceof RecClass) {
+    return subtype_(relations, t1.getType(), t2);
+  }
+  if (t2 instanceof RecClass) {
+    return subtype_(relations, t1, t2.getType());
+  }
+  return false;
+}
 var QueryObserver = (_a = class extends Subscribable {
   constructor(client, options) {
     super();
@@ -762,187 +2146,11 @@ function useMutation(options, queryClient) {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$4 = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-const ChevronDown = createLucideIcon("chevron-down", __iconNode$4);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$3 = [
-  ["path", { d: "M21.801 10A10 10 0 1 1 17 3.335", key: "yps3ct" }],
-  ["path", { d: "m9 11 3 3L22 4", key: "1pflzl" }]
-];
-const CircleCheckBig = createLucideIcon("circle-check-big", __iconNode$3);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$2 = [
+const __iconNode = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["polyline", { points: "12 6 12 12 16 14", key: "68esgv" }]
 ];
-const Clock = createLucideIcon("clock", __iconNode$2);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$1 = [["path", { d: "M21 12a9 9 0 1 1-6.219-8.56", key: "13zald" }]];
-const LoaderCircle = createLucideIcon("loader-circle", __iconNode$1);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode = [
-  [
-    "path",
-    {
-      d: "M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z",
-      key: "4pj2yx"
-    }
-  ],
-  ["path", { d: "M20 3v4", key: "1olli1" }],
-  ["path", { d: "M22 5h-4", key: "1gvqau" }],
-  ["path", { d: "M4 17v2", key: "vumght" }],
-  ["path", { d: "M5 18H3", key: "zchphs" }]
-];
-const Sparkles = createLucideIcon("sparkles", __iconNode);
-function setRef(ref, value) {
-  if (typeof ref === "function") {
-    return ref(value);
-  } else if (ref !== null && ref !== void 0) {
-    ref.current = value;
-  }
-}
-function composeRefs(...refs) {
-  return (node) => {
-    let hasCleanup = false;
-    const cleanups = refs.map((ref) => {
-      const cleanup = setRef(ref, node);
-      if (!hasCleanup && typeof cleanup == "function") {
-        hasCleanup = true;
-      }
-      return cleanup;
-    });
-    if (hasCleanup) {
-      return () => {
-        for (let i = 0; i < cleanups.length; i++) {
-          const cleanup = cleanups[i];
-          if (typeof cleanup == "function") {
-            cleanup();
-          } else {
-            setRef(refs[i], null);
-          }
-        }
-      };
-    }
-  };
-}
-var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-var use = React[" use ".trim().toString()];
-function isPromiseLike(value) {
-  return typeof value === "object" && value !== null && "then" in value;
-}
-function isLazyComponent(element) {
-  return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
-}
-// @__NO_SIDE_EFFECTS__
-function createSlot(ownerName) {
-  const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
-  const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
-    let { children, ...slotProps } = props;
-    if (isLazyComponent(children) && typeof use === "function") {
-      children = use(children._payload);
-    }
-    const childrenArray = reactExports.Children.toArray(children);
-    const slottable = childrenArray.find(isSlottable);
-    if (slottable) {
-      const newElement = slottable.props.children;
-      const newChildren = childrenArray.map((child) => {
-        if (child === slottable) {
-          if (reactExports.Children.count(newElement) > 1) return reactExports.Children.only(null);
-          return reactExports.isValidElement(newElement) ? newElement.props.children : null;
-        } else {
-          return child;
-        }
-      });
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children: reactExports.isValidElement(newElement) ? reactExports.cloneElement(newElement, void 0, newChildren) : null });
-    }
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children });
-  });
-  Slot2.displayName = `${ownerName}.Slot`;
-  return Slot2;
-}
-var Slot = /* @__PURE__ */ createSlot("Slot");
-// @__NO_SIDE_EFFECTS__
-function createSlotClone(ownerName) {
-  const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
-    let { children, ...slotProps } = props;
-    if (isLazyComponent(children) && typeof use === "function") {
-      children = use(children._payload);
-    }
-    if (reactExports.isValidElement(children)) {
-      const childrenRef = getElementRef(children);
-      const props2 = mergeProps(slotProps, children.props);
-      if (children.type !== reactExports.Fragment) {
-        props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
-      }
-      return reactExports.cloneElement(children, props2);
-    }
-    return reactExports.Children.count(children) > 1 ? reactExports.Children.only(null) : null;
-  });
-  SlotClone.displayName = `${ownerName}.SlotClone`;
-  return SlotClone;
-}
-var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
-function isSlottable(child) {
-  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
-}
-function mergeProps(slotProps, childProps) {
-  const overrideProps = { ...childProps };
-  for (const propName in childProps) {
-    const slotPropValue = slotProps[propName];
-    const childPropValue = childProps[propName];
-    const isHandler = /^on[A-Z]/.test(propName);
-    if (isHandler) {
-      if (slotPropValue && childPropValue) {
-        overrideProps[propName] = (...args) => {
-          const result = childPropValue(...args);
-          slotPropValue(...args);
-          return result;
-        };
-      } else if (slotPropValue) {
-        overrideProps[propName] = slotPropValue;
-      }
-    } else if (propName === "style") {
-      overrideProps[propName] = { ...slotPropValue, ...childPropValue };
-    } else if (propName === "className") {
-      overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
-    }
-  }
-  return { ...slotProps, ...overrideProps };
-}
-function getElementRef(element) {
-  var _a2, _b2;
-  let getter = (_a2 = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a2.get;
-  let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-  if (mayWarn) {
-    return element.ref;
-  }
-  getter = (_b2 = Object.getOwnPropertyDescriptor(element, "ref")) == null ? void 0 : _b2.get;
-  mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-  if (mayWarn) {
-    return element.props.ref;
-  }
-  return element.props.ref || element.ref;
-}
+const Clock = createLucideIcon("clock", __iconNode);
 function r(e) {
   var t, f, n = "";
   if ("string" == typeof e || "number" == typeof e) n += e;
@@ -956,46 +2164,6 @@ function clsx() {
   for (var e, t, f = 0, n = "", o = arguments.length; f < o; f++) (e = arguments[f]) && (t = r(e)) && (n && (n += " "), n += t);
   return n;
 }
-const falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
-const cx = clsx;
-const cva = (base, config) => (props) => {
-  var _config_compoundVariants;
-  if ((config === null || config === void 0 ? void 0 : config.variants) == null) return cx(base, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
-  const { variants, defaultVariants } = config;
-  const getVariantClassNames = Object.keys(variants).map((variant) => {
-    const variantProp = props === null || props === void 0 ? void 0 : props[variant];
-    const defaultVariantProp = defaultVariants === null || defaultVariants === void 0 ? void 0 : defaultVariants[variant];
-    if (variantProp === null) return null;
-    const variantKey = falsyToString(variantProp) || falsyToString(defaultVariantProp);
-    return variants[variant][variantKey];
-  });
-  const propsWithoutUndefined = props && Object.entries(props).reduce((acc, param) => {
-    let [key, value] = param;
-    if (value === void 0) {
-      return acc;
-    }
-    acc[key] = value;
-    return acc;
-  }, {});
-  const getCompoundVariantClassNames = config === null || config === void 0 ? void 0 : (_config_compoundVariants = config.compoundVariants) === null || _config_compoundVariants === void 0 ? void 0 : _config_compoundVariants.reduce((acc, param) => {
-    let { class: cvClass, className: cvClassName, ...compoundVariantOptions } = param;
-    return Object.entries(compoundVariantOptions).every((param2) => {
-      let [key, value] = param2;
-      return Array.isArray(value) ? value.includes({
-        ...defaultVariants,
-        ...propsWithoutUndefined
-      }[key]) : {
-        ...defaultVariants,
-        ...propsWithoutUndefined
-      }[key] === value;
-    }) ? [
-      ...acc,
-      cvClass,
-      cvClassName
-    ] : acc;
-  }, []);
-  return cx(base, getVariantClassNames, getCompoundVariantClassNames, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
-};
 const CLASS_PART_SEPARATOR = "-";
 const createClassGroupUtils = (config) => {
   const classMap = createClassMap(config);
@@ -3458,48 +4626,6 @@ const twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline: "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary: "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline"
-      },
-      size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9"
-      }
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default"
-    }
-  }
-);
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}) {
-  const Comp = asChild ? Slot : "button";
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Comp,
-    {
-      "data-slot": "button",
-      className: cn(buttonVariants({ variant, size, className })),
-      ...props
-    }
-  );
-}
 function Input({ className, type, ...props }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "input",
@@ -3516,737 +4642,473 @@ function Input({ className, type, ...props }) {
     }
   );
 }
-var NODES = [
-  "a",
-  "button",
-  "div",
-  "form",
-  "h2",
-  "h3",
-  "img",
-  "input",
-  "label",
-  "li",
-  "nav",
-  "ol",
-  "p",
-  "select",
-  "span",
-  "svg",
-  "ul"
-];
-var Primitive = NODES.reduce((primitive, node) => {
-  const Slot2 = /* @__PURE__ */ createSlot(`Primitive.${node}`);
-  const Node = reactExports.forwardRef((props, forwardedRef) => {
-    const { asChild, ...primitiveProps } = props;
-    const Comp = asChild ? Slot2 : node;
-    if (typeof window !== "undefined") {
-      window[Symbol.for("radix-ui")] = true;
-    }
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Comp, { ...primitiveProps, ref: forwardedRef });
-  });
-  Node.displayName = `Primitive.${node}`;
-  return { ...primitive, [node]: Node };
-}, {});
-var NAME = "Label";
-var Label$1 = reactExports.forwardRef((props, forwardedRef) => {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Primitive.label,
-    {
-      ...props,
-      ref: forwardedRef,
-      onMouseDown: (event) => {
-        var _a2;
-        const target = event.target;
-        if (target.closest("button, input, select, textarea")) return;
-        (_a2 = props.onMouseDown) == null ? void 0 : _a2.call(props, event);
-        if (!event.defaultPrevented && event.detail > 1) event.preventDefault();
-      }
-    }
-  );
+const BookingId = Nat;
+const BookingStatus$1 = Variant({
+  "cancelled": Null,
+  "pending": Null,
+  "confirmed": Null
 });
-Label$1.displayName = NAME;
-var Root = Label$1;
-function Label({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Root,
-    {
-      "data-slot": "label",
-      className: cn(
-        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-        className
-      ),
-      ...props
-    }
-  );
+const PaymentStatus$1 = Variant({
+  "paid": Null,
+  "unpaid": Null
+});
+const TeamMemberId = Nat;
+const Timestamp = Int;
+const ServiceId = Nat;
+const Booking = Record({
+  "id": BookingId,
+  "customerName": Text,
+  "status": BookingStatus$1,
+  "paymentStatus": PaymentStatus$1,
+  "customerPhone": Text,
+  "teamMemberId": Opt(TeamMemberId),
+  "createdAt": Timestamp,
+  "preferredDateTime": Text,
+  "serviceIds": Vec(ServiceId),
+  "referenceCode": Text,
+  "totalAmount": Nat,
+  "stripeSessionId": Opt(Text),
+  "customerEmail": Text
+});
+const BookingResult = Variant({ "ok": Booking, "err": Text });
+const ShoppingItem = Record({
+  "productName": Text,
+  "currency": Text,
+  "quantity": Nat,
+  "priceInCents": Nat,
+  "productDescription": Text
+});
+const CheckoutRequest = Record({
+  "customerName": Text,
+  "cancelUrl": Text,
+  "customerPhone": Text,
+  "teamMemberId": Opt(TeamMemberId),
+  "preferredDateTime": Text,
+  "serviceIds": Vec(ServiceId),
+  "customerEmail": Text,
+  "successUrl": Text
+});
+const CheckoutSessionResult = Variant({
+  "ok": Record({ "checkoutUrl": Text, "sessionId": Text }),
+  "err": Text
+});
+const ServiceCategory$1 = Variant({
+  "fade": Null,
+  "haircut": Null,
+  "beardTrim": Null,
+  "lineup": Null
+});
+const Service = Record({
+  "id": ServiceId,
+  "name": Text,
+  "description": Text,
+  "durationMinutes": Nat,
+  "category": ServiceCategory$1,
+  "price": Nat
+});
+const StripeSessionStatus = Variant({
+  "completed": Record({
+    "userPrincipal": Opt(Text),
+    "response": Text
+  }),
+  "failed": Record({ "error": Text })
+});
+const TeamMember = Record({
+  "id": TeamMemberId,
+  "name": Text,
+  "specialty": Text
+});
+const http_header = Record({
+  "value": Text,
+  "name": Text
+});
+const http_request_result = Record({
+  "status": Nat,
+  "body": Vec(Nat8),
+  "headers": Vec(http_header)
+});
+const TransformationInput = Record({
+  "context": Vec(Nat8),
+  "response": http_request_result
+});
+const TransformationOutput = Record({
+  "status": Nat,
+  "body": Vec(Nat8),
+  "headers": Vec(http_header)
+});
+Service$1({
+  "cancelBooking": Func([BookingId], [BookingResult], []),
+  "confirmBookingAfterPayment": Func([Text], [BookingResult], []),
+  "createCheckoutSession": Func(
+    [Vec(ShoppingItem), Text, Text],
+    [Text],
+    []
+  ),
+  "createStripeCheckoutSession": Func(
+    [CheckoutRequest],
+    [CheckoutSessionResult],
+    []
+  ),
+  "getBooking": Func([BookingId], [Opt(Booking)], ["query"]),
+  "getService": Func([ServiceId], [Opt(Service)], ["query"]),
+  "getStripeSessionStatus": Func([Text], [StripeSessionStatus], []),
+  "getTeamMember": Func([TeamMemberId], [Opt(TeamMember)], ["query"]),
+  "isStripeConfigured": Func([], [Bool], ["query"]),
+  "listAllBookings": Func([], [Vec(Booking)], ["query"]),
+  "listBookings": Func([], [Vec(Booking)], ["query"]),
+  "listBookingsByDate": Func([Text], [Vec(Booking)], ["query"]),
+  "listFutureBookings": Func([], [Vec(Booking)], ["query"]),
+  "listServices": Func([], [Vec(Service)], ["query"]),
+  "listTeamMembers": Func([], [Vec(TeamMember)], ["query"]),
+  "markBookingPaid": Func([BookingId], [BookingResult], []),
+  "setStripeConfiguration": Func([Text], [], []),
+  "transform": Func(
+    [TransformationInput],
+    [TransformationOutput],
+    ["query"]
+  )
+});
+var BookingStatus = /* @__PURE__ */ ((BookingStatus2) => {
+  BookingStatus2["cancelled"] = "cancelled";
+  BookingStatus2["pending"] = "pending";
+  BookingStatus2["confirmed"] = "confirmed";
+  return BookingStatus2;
+})(BookingStatus || {});
+var PaymentStatus = /* @__PURE__ */ ((PaymentStatus2) => {
+  PaymentStatus2["paid"] = "paid";
+  PaymentStatus2["unpaid"] = "unpaid";
+  return PaymentStatus2;
+})(PaymentStatus || {});
+var ServiceCategory = /* @__PURE__ */ ((ServiceCategory2) => {
+  ServiceCategory2["fade"] = "fade";
+  ServiceCategory2["haircut"] = "haircut";
+  ServiceCategory2["beardTrim"] = "beardTrim";
+  ServiceCategory2["lineup"] = "lineup";
+  return ServiceCategory2;
+})(ServiceCategory || {});
+const sampleServices = [
+  {
+    id: BigInt(1),
+    name: "Classic Haircut",
+    description: "Precision scissor cut with styling, tailored to your face shape.",
+    durationMinutes: BigInt(45),
+    category: ServiceCategory.haircut,
+    price: BigInt(35)
+  },
+  {
+    id: BigInt(2),
+    name: "Skin Fade",
+    description: "Clean skin fade blended to perfection.",
+    durationMinutes: BigInt(50),
+    category: ServiceCategory.fade,
+    price: BigInt(45)
+  },
+  {
+    id: BigInt(3),
+    name: "Beard Trim & Shape",
+    description: "Hot towel shave and beard sculpting.",
+    durationMinutes: BigInt(30),
+    category: ServiceCategory.beardTrim,
+    price: BigInt(25)
+  },
+  {
+    id: BigInt(4),
+    name: "Lineup & Edge Up",
+    description: "Crisp hairline, temple, and neckline definition.",
+    durationMinutes: BigInt(20),
+    category: ServiceCategory.lineup,
+    price: BigInt(20)
+  }
+];
+const sampleTeamMembers = [
+  { id: BigInt(1), name: "Master Deepak", specialty: "Hair Expert" },
+  { id: BigInt(2), name: "Rahul Sen", specialty: "Beard Specialist" }
+];
+const today = /* @__PURE__ */ new Date();
+const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+const prevDay = today.getDate() - 1;
+const pastDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(prevDay).padStart(2, "0")}`;
+const tomorrow = new Date(today);
+tomorrow.setDate(today.getDate() + 1);
+const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+const dayAfter = new Date(today);
+dayAfter.setDate(today.getDate() + 3);
+const dayAfterStr = `${dayAfter.getFullYear()}-${String(dayAfter.getMonth() + 1).padStart(2, "0")}-${String(dayAfter.getDate()).padStart(2, "0")}`;
+const nowNs = BigInt(Date.now()) * BigInt(1e6);
+const SERVICE_PRICES = {
+  1: 1500,
+  // Butterfly Haircut
+  2: 1200,
+  // Signature Haircut
+  3: 1400,
+  // Wolf Haircut
+  4: 1100,
+  // Round Layers
+  5: 1800,
+  // Rhombus Cut
+  6: 3500,
+  // Advanced Hair Color
+  7: 4e3
+  // Chemical Treatments
+};
+const bookingStore = [
+  {
+    id: BigInt(1),
+    customerName: "Arjun Sharma",
+    customerEmail: "arjun.sharma@gmail.com",
+    customerPhone: "+91 98765 43210",
+    serviceIds: [BigInt(1)],
+    teamMemberId: BigInt(1),
+    preferredDateTime: `${todayStr}T10:00`,
+    status: BookingStatus.confirmed,
+    paymentStatus: PaymentStatus.paid,
+    referenceCode: `MD-${todayStr.replace(/-/g, "")}-001`,
+    createdAt: nowNs,
+    totalAmount: BigInt(1500),
+    stripeSessionId: "cs_mock_001"
+  },
+  {
+    id: BigInt(2),
+    customerName: "Priya Mehta",
+    customerEmail: "priya.mehta@yahoo.com",
+    customerPhone: "+91 87654 32109",
+    serviceIds: [BigInt(2), BigInt(6)],
+    teamMemberId: BigInt(1),
+    preferredDateTime: `${todayStr}T11:30`,
+    status: BookingStatus.confirmed,
+    paymentStatus: PaymentStatus.unpaid,
+    referenceCode: `MD-${todayStr.replace(/-/g, "")}-002`,
+    createdAt: nowNs,
+    totalAmount: BigInt(4700),
+    stripeSessionId: "cs_mock_002"
+  },
+  {
+    id: BigInt(3),
+    customerName: "Rajesh Kumar",
+    customerEmail: "rajesh.k@hotmail.com",
+    customerPhone: "+91 76543 21098",
+    serviceIds: [BigInt(3)],
+    teamMemberId: BigInt(2),
+    preferredDateTime: `${todayStr}T14:00`,
+    status: BookingStatus.pending,
+    paymentStatus: PaymentStatus.unpaid,
+    referenceCode: `MD-${todayStr.replace(/-/g, "")}-003`,
+    createdAt: nowNs,
+    totalAmount: BigInt(1400),
+    stripeSessionId: void 0
+  },
+  {
+    id: BigInt(4),
+    customerName: "Kavya Singh",
+    customerEmail: "kavya.s@gmail.com",
+    customerPhone: "+91 65432 10987",
+    serviceIds: [BigInt(1), BigInt(3)],
+    teamMemberId: BigInt(1),
+    preferredDateTime: `${pastDate}T09:00`,
+    status: BookingStatus.confirmed,
+    paymentStatus: PaymentStatus.paid,
+    referenceCode: `MD-${pastDate.replace(/-/g, "")}-001`,
+    createdAt: nowNs,
+    totalAmount: BigInt(2900),
+    stripeSessionId: "cs_mock_004"
+  },
+  {
+    id: BigInt(5),
+    customerName: "Amit Patel",
+    customerEmail: "amit.p@gmail.com",
+    customerPhone: "+91 54321 09876",
+    serviceIds: [BigInt(2)],
+    teamMemberId: BigInt(2),
+    preferredDateTime: `${pastDate}T15:00`,
+    status: BookingStatus.confirmed,
+    paymentStatus: PaymentStatus.unpaid,
+    referenceCode: `MD-${pastDate.replace(/-/g, "")}-002`,
+    createdAt: nowNs,
+    totalAmount: BigInt(1200),
+    stripeSessionId: void 0
+  },
+  // Future bookings
+  {
+    id: BigInt(6),
+    customerName: "Neha Kapoor",
+    customerEmail: "neha.kapoor@gmail.com",
+    customerPhone: "+91 99887 66554",
+    serviceIds: [BigInt(5), BigInt(6)],
+    teamMemberId: BigInt(1),
+    preferredDateTime: `${tomorrowStr}T10:30`,
+    status: BookingStatus.confirmed,
+    paymentStatus: PaymentStatus.paid,
+    referenceCode: `MD-${tomorrowStr.replace(/-/g, "")}-001`,
+    createdAt: nowNs,
+    totalAmount: BigInt(5300),
+    stripeSessionId: "cs_mock_006"
+  },
+  {
+    id: BigInt(7),
+    customerName: "Rohan Verma",
+    customerEmail: "rohan.v@gmail.com",
+    customerPhone: "+91 88776 55443",
+    serviceIds: [BigInt(2), BigInt(4)],
+    teamMemberId: BigInt(2),
+    preferredDateTime: `${tomorrowStr}T14:00`,
+    status: BookingStatus.confirmed,
+    paymentStatus: PaymentStatus.unpaid,
+    referenceCode: `MD-${tomorrowStr.replace(/-/g, "")}-002`,
+    createdAt: nowNs,
+    totalAmount: BigInt(2300),
+    stripeSessionId: "cs_mock_007"
+  },
+  {
+    id: BigInt(8),
+    customerName: "Sunita Joshi",
+    customerEmail: "sunita.j@yahoo.com",
+    customerPhone: "+91 77665 44332",
+    serviceIds: [BigInt(7)],
+    teamMemberId: BigInt(1),
+    preferredDateTime: `${dayAfterStr}T11:00`,
+    status: BookingStatus.confirmed,
+    paymentStatus: PaymentStatus.paid,
+    referenceCode: `MD-${dayAfterStr.replace(/-/g, "")}-001`,
+    createdAt: nowNs,
+    totalAmount: BigInt(4e3),
+    stripeSessionId: "cs_mock_008"
+  }
+];
+let _nextId = 9;
+function nextRefCode() {
+  const d = /* @__PURE__ */ new Date();
+  const ds = String(d.getFullYear()) + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+  return `MD-${ds}-${String(_nextId).padStart(3, "0")}`;
 }
-function useCreateBooking() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (req) => {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      const booking = {
-        id: Date.now(),
-        customerName: req.customerName,
-        customerEmail: req.customerEmail,
-        customerPhone: req.customerPhone,
-        serviceId: req.serviceId,
-        teamMemberId: req.teamMemberId,
-        preferredDateTime: req.preferredDateTime,
-        status: "confirmed",
-        createdAt: Date.now()
+const pendingSessions = /* @__PURE__ */ new Map();
+const mockBackend = {
+  listServices: async () => sampleServices,
+  listTeamMembers: async () => sampleTeamMembers,
+  listBookings: async () => bookingStore.filter((b) => b.preferredDateTime.startsWith(todayStr)),
+  listAllBookings: async () => [...bookingStore],
+  listBookingsByDate: async (dateStr) => bookingStore.filter((b) => b.preferredDateTime.startsWith(dateStr)),
+  listFutureBookings: async () => {
+    const nowStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 16);
+    return bookingStore.filter((b) => b.preferredDateTime > nowStr).sort((a, b) => a.preferredDateTime.localeCompare(b.preferredDateTime));
+  },
+  markBookingPaid: async (id) => {
+    const idx = bookingStore.findIndex((b) => b.id === id);
+    if (idx === -1) return { __kind__: "err", err: "Booking not found" };
+    bookingStore[idx] = { ...bookingStore[idx], paymentStatus: PaymentStatus.paid };
+    return { __kind__: "ok", ok: bookingStore[idx] };
+  },
+  /** Legacy — removed from backendInterface, kept as dead code for reference */
+  // createBooking was removed when multi-service Stripe flow was introduced
+  /**
+   * Mock Stripe checkout session creation.
+   * Returns a fake checkout URL that redirects to /booking?session_id=<id>
+   * so the confirmation flow can be tested in dev without real Stripe.
+   */
+  createStripeCheckoutSession: async (req) => {
+    const conflict = bookingStore.some(
+      (b) => b.preferredDateTime === req.preferredDateTime
+    );
+    if (conflict) {
+      return {
+        __kind__: "err",
+        err: "This time slot is already booked. Please choose a different time."
       };
-      return booking;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookings"] });
     }
-  });
-}
-const MASTER_DEEPAK_SERVICES = [
-  {
-    id: 1,
-    name: "Butterfly Haircut",
-    description: "Master Deepak's signature layered butterfly cut — featherlight layers that frame the face with dramatic flair. A showstopper transformation.",
-    price: 1500,
-    durationMinutes: 60,
-    category: "haircut"
-  },
-  {
-    id: 2,
-    name: "Signature Haircut",
-    description: "The original Master Deepak signature — precision scissor work crafted for your bone structure. A cut that speaks confidence.",
-    price: 1200,
-    durationMinutes: 50,
-    category: "haircut"
-  },
-  {
-    id: 3,
-    name: "Wolf Haircut",
-    description: "Edgy textured wolf cut with layered volume and lived-in movement. Perfect for bold personalities who own every room.",
-    price: 1400,
-    durationMinutes: 55,
-    category: "haircut"
-  },
-  {
-    id: 4,
-    name: "Round Layers",
-    description: "Soft, bouncy round layers that add body and movement. Timeless elegance meets modern technique.",
-    price: 1100,
-    durationMinutes: 50,
-    category: "haircut"
-  },
-  {
-    id: 5,
-    name: "Rhombus Cut",
-    description: "The innovative rhombus cut — geometric precision and artistic shaping unique to Master Scissor Academy's curriculum.",
-    price: 1800,
-    durationMinutes: 65,
-    category: "haircut"
-  },
-  {
-    id: 6,
-    name: "Advanced Hair Color",
-    description: "Balayage, highlights, ombre, and vivid color transformations. Ammonia-free options available. Results that stop traffic.",
-    price: 3500,
-    durationMinutes: 120,
-    category: "combo"
-  },
-  {
-    id: 7,
-    name: "Chemical Treatments",
-    description: "Keratin smoothing, rebonding, and protein treatments for salon-glossy hair that lasts months. Approved professional products only.",
-    price: 4e3,
-    durationMinutes: 150,
-    category: "combo"
-  }
-];
-function useServices(category) {
-  return useQuery({
-    queryKey: ["services", category],
-    queryFn: async () => {
-      return MASTER_DEEPAK_SERVICES;
-    },
-    staleTime: 1e3 * 60 * 5
-  });
-}
-const STATIC_TEAM = [
-  {
-    id: 1,
-    name: "Marcus Webb",
-    specialty: "Skin fades, textured crops, and modern styling"
-  },
-  {
-    id: 2,
-    name: "Dario Reyes",
-    specialty: "Classic cuts, hot towel shaves, beard sculpting"
-  },
-  {
-    id: 3,
-    name: "Theo Okafor",
-    specialty: "Afro textures, waves, creative designs"
-  },
-  {
-    id: 4,
-    name: "James Calloway",
-    specialty: "Precision tapers, pompadours, vintage styles"
-  }
-];
-function useTeamMembers() {
-  return useQuery({
-    queryKey: ["teamMembers"],
-    queryFn: async () => {
-      return STATIC_TEAM;
-    },
-    staleTime: 1e3 * 60 * 10
-  });
-}
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-function validate(fields) {
-  var _a2, _b2, _c, _d;
-  const errors = {};
-  if (!((_a2 = fields.customerName) == null ? void 0 : _a2.trim())) errors.customerName = "Name is required.";
-  if (!((_b2 = fields.customerEmail) == null ? void 0 : _b2.trim())) {
-    errors.customerEmail = "Email is required.";
-  } else if (!EMAIL_RE.test(fields.customerEmail)) {
-    errors.customerEmail = "Enter a valid email address.";
-  }
-  if (!((_c = fields.customerPhone) == null ? void 0 : _c.trim()))
-    errors.customerPhone = "Phone number is required.";
-  if (!fields.serviceId) errors.serviceId = "Please select a service.";
-  if (!((_d = fields.preferredDateTime) == null ? void 0 : _d.trim()))
-    errors.preferredDateTime = "Please choose a date and time.";
-  return errors;
-}
-function FieldError({ message }) {
-  if (!message) return null;
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("p", { role: "alert", className: "text-sm mt-1.5 text-destructive font-medium", children: message });
-}
-function SectionHeading({ children }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-5", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-display text-base font-semibold text-accent uppercase tracking-widest pb-3 border-b border-border flex items-center gap-2", children }) });
-}
-function Booking() {
-  const { data: services = [], isLoading: loadingServices } = useServices();
-  const { data: team = [], isLoading: loadingTeam } = useTeamMembers();
-  const mutation = useCreateBooking();
-  const [form, setForm] = reactExports.useState({
-    customerName: "",
-    customerEmail: "",
-    customerPhone: "",
-    preferredDateTime: ""
-  });
-  const [touched, setTouched] = reactExports.useState({});
-  const [submitted, setSubmitted] = reactExports.useState(false);
-  const [bookingRef, setBookingRef] = reactExports.useState("");
-  const errors = validate(form);
-  const hasErrors = Object.keys(errors).length > 0;
-  function handleChange(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
-  function handleBlur(field) {
-    setTouched((prev) => ({ ...prev, [field]: true }));
-  }
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setTouched({
-      customerName: true,
-      customerEmail: true,
-      customerPhone: true,
-      serviceId: true,
-      preferredDateTime: true
+    const sessionId = `mock_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const total = req.serviceIds.reduce((sum, id) => {
+      return sum + BigInt(SERVICE_PRICES[Number(id)] ?? 0);
+    }, BigInt(0));
+    pendingSessions.set(sessionId, {
+      sessionId,
+      customerName: req.customerName,
+      customerEmail: req.customerEmail,
+      customerPhone: req.customerPhone,
+      serviceIds: req.serviceIds,
+      teamMemberId: req.teamMemberId,
+      preferredDateTime: req.preferredDateTime,
+      totalAmount: total
     });
-    if (hasErrors) return;
-    try {
-      const booking = await mutation.mutateAsync(form);
-      const ref = `MD-${String(booking.id).slice(-6).padStart(6, "0")}`;
-      setBookingRef(ref);
-      setSubmitted(true);
-    } catch {
+    const successBase = req.successUrl.split("?")[0];
+    const checkoutUrl = `${successBase}?session_id=${sessionId}`;
+    return {
+      __kind__: "ok",
+      ok: { sessionId, checkoutUrl }
+    };
+  },
+  /**
+   * Mock payment confirmation.
+   * Looks up the pending session and creates the booking with paymentStatus=paid.
+   */
+  confirmBookingAfterPayment: async (stripeSessionId) => {
+    const existing = bookingStore.find(
+      (b) => b.stripeSessionId === stripeSessionId
+    );
+    if (existing) return { __kind__: "ok", ok: existing };
+    const session = pendingSessions.get(stripeSessionId);
+    if (!session) {
+      return {
+        __kind__: "err",
+        err: "Payment session not found or expired."
+      };
     }
-  }
-  const selectedService = services.find((s) => s.id === form.serviceId);
-  if (submitted) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-24 pb-20 min-h-screen flex items-center justify-center bg-background", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 pointer-events-none overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "div",
-        {
-          className: "absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full opacity-5",
-          style: {
-            background: "radial-gradient(ellipse, oklch(0.74 0.14 68), transparent 70%)"
-          }
-        }
-      ) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        motion.div,
-        {
-          initial: { opacity: 0, scale: 0.95 },
-          animate: { opacity: 1, scale: 1 },
-          transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-          className: "max-w-lg w-full mx-auto px-6 text-center",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-6 flex justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-24 h-24 rounded-full flex items-center justify-center bg-accent/10 border border-accent/30 shadow-gold", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CircleCheckBig, { className: "w-11 h-11 text-accent" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -right-1 w-7 h-7 rounded-full bg-destructive flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "w-4 h-4 text-destructive-foreground" }) })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "badge-gold mb-4 mx-auto w-fit", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Scissors, { className: "w-3 h-3" }),
-              " Booking Confirmed"
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "font-display text-4xl md:text-5xl font-bold text-foreground mb-3 leading-tight", children: [
-              "You're All ",
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gradient-gold", children: "Set!" })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground text-lg mb-8 leading-relaxed", children: "Your appointment with Master Deepak has been received. We'll contact you shortly to confirm." }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "card-premium mb-8 text-left", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs uppercase tracking-[0.2em] text-accent font-bold mb-3", children: "Booking Reference" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "div",
-                {
-                  className: "font-display text-4xl font-bold mb-5 text-gradient-gold",
-                  "data-ocid": "booking-ref",
-                  children: bookingRef
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 text-sm", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center py-2 border-b border-border/40", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "Name" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-foreground font-semibold", children: form.customerName })
-                ] }),
-                selectedService && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center py-2 border-b border-border/40", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "Service" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-foreground font-semibold", children: selectedService.name })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center py-2 border-b border-border/40", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "Date & Time" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-foreground font-semibold", children: form.preferredDateTime ? new Date(form.preferredDateTime).toLocaleString(
-                    "en-IN",
-                    {
-                      dateStyle: "medium",
-                      timeStyle: "short"
-                    }
-                  ) : "" })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center py-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground", children: "Status" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-accent font-bold uppercase tracking-wider text-xs", children: "Confirmed" })
-                ] })
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row gap-3 justify-center", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "button",
-                {
-                  type: "button",
-                  className: "btn-cta",
-                  onClick: () => {
-                    setSubmitted(false);
-                    setForm({
-                      customerName: "",
-                      customerEmail: "",
-                      customerPhone: "",
-                      preferredDateTime: ""
-                    });
-                    setTouched({});
-                    setBookingRef("");
-                  },
-                  "data-ocid": "book-another",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Scissors, { className: "w-4 h-4" }),
-                    "Book Another"
-                  ]
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "a",
-                {
-                  href: "https://wa.me/918828104056",
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                  className: "btn-secondary",
-                  children: "WhatsApp Us"
-                }
-              )
-            ] })
-          ]
-        }
-      )
-    ] }) });
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-h-screen bg-background", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative pt-24 pb-14 overflow-hidden", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 pointer-events-none", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
-          {
-            className: "absolute inset-0 opacity-[0.03]",
-            style: {
-              backgroundImage: "repeating-linear-gradient(45deg, oklch(0.74 0.14 68) 0, oklch(0.74 0.14 68) 1px, transparent 0, transparent 50%)",
-              backgroundSize: "20px 20px"
-            }
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
-          {
-            className: "absolute top-0 right-0 w-[500px] h-[400px] opacity-10",
-            style: {
-              background: "radial-gradient(ellipse at top right, oklch(0.74 0.14 68), transparent 60%)"
-            }
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative max-w-2xl mx-auto px-6 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        motion.div,
-        {
-          initial: { opacity: 0, y: 24 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "badge-gold mb-5 mx-auto w-fit", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Scissors, { className: "w-3 h-3" }),
-              " Master Deepak Hair Expert"
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "font-display text-5xl md:text-7xl font-black text-foreground leading-none tracking-tight mb-4", children: [
-              "Book Your",
-              /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gradient-gold", children: "Appointment" })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground text-lg max-w-md mx-auto leading-relaxed", children: "Reserve your session at Andheri West, Mumbai or Bhilwara, Rajasthan — premium cuts, colors & chemical treatments." })
-          ]
-        }
-      ) })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-2xl mx-auto px-6 mb-10", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "divider-gold", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "w-4 h-4 text-accent shrink-0" }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      motion.div,
-      {
-        initial: { opacity: 0, y: 30 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.6, delay: 0.15 },
-        className: "max-w-xl mx-auto px-6 pb-20",
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-sm border border-border bg-card shadow-elevated overflow-hidden", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-accent/8 border-b border-border px-8 py-4 flex items-center gap-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Scissors, { className: "w-4 h-4 text-accent" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-muted-foreground uppercase tracking-widest font-semibold", children: "Fill in your details" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-foreground font-semibold text-sm", children: "Appointment Request Form" })
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "form",
-              {
-                onSubmit: handleSubmit,
-                noValidate: true,
-                className: "px-8 py-8 space-y-8",
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(SectionHeading, { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-5 h-5 rounded-full bg-accent/15 border border-accent/30 inline-flex items-center justify-center text-[10px] font-black", children: "1" }),
-                      "Your Details"
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                          Label,
-                          {
-                            htmlFor: "customerName",
-                            className: "text-foreground font-semibold text-sm mb-2 block",
-                            children: [
-                              "Full Name ",
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-accent", children: "*" })
-                            ]
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Input,
-                          {
-                            id: "customerName",
-                            type: "text",
-                            placeholder: "Your full name",
-                            value: form.customerName ?? "",
-                            onChange: (e) => handleChange("customerName", e.target.value),
-                            onBlur: () => handleBlur("customerName"),
-                            "data-ocid": "input-name",
-                            "aria-invalid": touched.customerName && !!errors.customerName,
-                            className: "bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-accent h-11"
-                          }
-                        ),
-                        touched.customerName && /* @__PURE__ */ jsxRuntimeExports.jsx(FieldError, { message: errors.customerName })
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                          Label,
-                          {
-                            htmlFor: "customerEmail",
-                            className: "text-foreground font-semibold text-sm mb-2 block",
-                            children: [
-                              "Email Address ",
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-accent", children: "*" })
-                            ]
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Input,
-                          {
-                            id: "customerEmail",
-                            type: "email",
-                            placeholder: "your@email.com",
-                            value: form.customerEmail ?? "",
-                            onChange: (e) => handleChange("customerEmail", e.target.value),
-                            onBlur: () => handleBlur("customerEmail"),
-                            "data-ocid": "input-email",
-                            "aria-invalid": touched.customerEmail && !!errors.customerEmail,
-                            className: "bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-accent h-11"
-                          }
-                        ),
-                        touched.customerEmail && /* @__PURE__ */ jsxRuntimeExports.jsx(FieldError, { message: errors.customerEmail })
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                          Label,
-                          {
-                            htmlFor: "customerPhone",
-                            className: "text-foreground font-semibold text-sm mb-2 block",
-                            children: [
-                              "Phone Number ",
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-accent", children: "*" })
-                            ]
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Input,
-                          {
-                            id: "customerPhone",
-                            type: "tel",
-                            placeholder: "+91 98765 43210",
-                            value: form.customerPhone ?? "",
-                            onChange: (e) => handleChange("customerPhone", e.target.value),
-                            onBlur: () => handleBlur("customerPhone"),
-                            "data-ocid": "input-phone",
-                            "aria-invalid": touched.customerPhone && !!errors.customerPhone,
-                            className: "bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-accent h-11"
-                          }
-                        ),
-                        touched.customerPhone && /* @__PURE__ */ jsxRuntimeExports.jsx(FieldError, { message: errors.customerPhone })
-                      ] })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(SectionHeading, { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-5 h-5 rounded-full bg-accent/15 border border-accent/30 inline-flex items-center justify-center text-[10px] font-black", children: "2" }),
-                      "Service & Barber"
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                          Label,
-                          {
-                            htmlFor: "serviceId",
-                            className: "text-foreground font-semibold text-sm mb-2 block",
-                            children: [
-                              "Select Service ",
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-accent", children: "*" })
-                            ]
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                            "select",
-                            {
-                              id: "serviceId",
-                              value: form.serviceId ?? "",
-                              onChange: (e) => handleChange(
-                                "serviceId",
-                                e.target.value ? Number(e.target.value) : void 0
-                              ),
-                              onBlur: () => handleBlur("serviceId"),
-                              "data-ocid": "select-service",
-                              "aria-invalid": touched.serviceId && !!errors.serviceId,
-                              disabled: loadingServices,
-                              className: "w-full h-11 rounded-md pl-3 pr-10 text-sm text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background transition-smooth disabled:opacity-50 disabled:cursor-not-allowed bg-background border border-input",
-                              children: [
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", className: "bg-card text-foreground", children: loadingServices ? "Loading services…" : "Choose a service" }),
-                                services.map((s) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                                  "option",
-                                  {
-                                    value: s.id,
-                                    className: "bg-card text-foreground",
-                                    children: [
-                                      s.name,
-                                      " — ₹",
-                                      s.price,
-                                      " · ",
-                                      s.durationMinutes,
-                                      " min"
-                                    ]
-                                  },
-                                  s.id
-                                ))
-                              ]
-                            }
-                          ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" })
-                        ] }),
-                        touched.serviceId && /* @__PURE__ */ jsxRuntimeExports.jsx(FieldError, { message: errors.serviceId }),
-                        selectedService && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2.5 px-3.5 py-2.5 rounded-md text-sm text-muted-foreground flex items-start gap-2 bg-accent/5 border border-accent/20", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3.5 h-3.5 shrink-0 text-accent mt-0.5" }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: selectedService.description })
-                        ] })
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                          Label,
-                          {
-                            htmlFor: "teamMemberId",
-                            className: "text-foreground font-semibold text-sm mb-2 block",
-                            children: [
-                              "Preferred Barber",
-                              " ",
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-muted-foreground font-normal", children: "(optional)" })
-                            ]
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                            "select",
-                            {
-                              id: "teamMemberId",
-                              value: form.teamMemberId ?? "",
-                              onChange: (e) => handleChange(
-                                "teamMemberId",
-                                e.target.value ? Number(e.target.value) : void 0
-                              ),
-                              "data-ocid": "select-barber",
-                              disabled: loadingTeam,
-                              className: "w-full h-11 rounded-md pl-3 pr-10 text-sm text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background transition-smooth disabled:opacity-50 disabled:cursor-not-allowed bg-background border border-input",
-                              children: [
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", className: "bg-card text-foreground", children: loadingTeam ? "Loading barbers…" : "No preference — any barber" }),
-                                team.map((m) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-                                  "option",
-                                  {
-                                    value: m.id,
-                                    className: "bg-card text-foreground",
-                                    children: m.name
-                                  },
-                                  m.id
-                                ))
-                              ]
-                            }
-                          ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" })
-                        ] })
-                      ] })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(SectionHeading, { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-5 h-5 rounded-full bg-accent/15 border border-accent/30 inline-flex items-center justify-center text-[10px] font-black", children: "3" }),
-                      "Date & Time"
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                        Label,
-                        {
-                          htmlFor: "preferredDateTime",
-                          className: "text-foreground font-semibold text-sm mb-2 block",
-                          children: [
-                            "Preferred Date & Time",
-                            " ",
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-accent", children: "*" })
-                          ]
-                        }
-                      ),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Input,
-                        {
-                          id: "preferredDateTime",
-                          type: "datetime-local",
-                          value: form.preferredDateTime ?? "",
-                          min: (() => {
-                            const now = /* @__PURE__ */ new Date();
-                            const year = now.getFullYear();
-                            const month = String(now.getMonth() + 1).padStart(2, "0");
-                            const date = String(now.getDate()).padStart(2, "0");
-                            const hours = String(now.getHours()).padStart(2, "0");
-                            const minutes = String(now.getMinutes()).padStart(2, "0");
-                            return `${year}-${month}-${date}T${hours}:${minutes}`;
-                          })(),
-                          onChange: (e) => handleChange("preferredDateTime", e.target.value),
-                          onBlur: () => handleBlur("preferredDateTime"),
-                          "data-ocid": "input-datetime",
-                          "aria-invalid": touched.preferredDateTime && !!errors.preferredDateTime,
-                          className: "bg-background border-border text-foreground focus-visible:ring-accent h-11 [color-scheme:dark]"
-                        }
-                      ),
-                      touched.preferredDateTime && /* @__PURE__ */ jsxRuntimeExports.jsx(FieldError, { message: errors.preferredDateTime }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-xs text-muted-foreground", children: "Available: Mon–Sat, 10am–7pm IST · Mumbai & Bhilwara locations" })
-                    ] })
-                  ] }),
-                  mutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "div",
-                    {
-                      className: "rounded-md px-4 py-3 text-sm bg-destructive/10 border border-destructive/40 text-destructive font-medium",
-                      role: "alert",
-                      children: "Something went wrong. Please try again or WhatsApp us at +91-8058564056."
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-1", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Button,
-                      {
-                        type: "submit",
-                        disabled: mutation.isPending,
-                        "data-ocid": "submit-booking",
-                        className: "btn-cta w-full h-12",
-                        children: mutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(LoaderCircle, { className: "w-4 h-4 animate-spin" }),
-                          "Booking…"
-                        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(Scissors, { className: "w-4 h-4" }),
-                          "Confirm Appointment"
-                        ] })
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-center text-xs text-muted-foreground mt-3", children: "We'll confirm your slot within the hour via call or WhatsApp." })
-                  ] })
-                ]
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 p-5 rounded-sm border border-border bg-card/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-muted-foreground text-center sm:text-left", children: "Prefer to book directly?" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-3 justify-center", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "a",
-                {
-                  href: "tel:+918828104056",
-                  className: "btn-secondary py-2 px-5 text-xs",
-                  "data-ocid": "contact-call-1",
-                  children: "📞 Call Mumbai"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "a",
-                {
-                  href: "https://wa.me/918058564056",
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                  className: "btn-primary py-2 px-5 text-xs",
-                  "data-ocid": "contact-whatsapp",
-                  children: "💬 WhatsApp"
-                }
-              )
-            ] })
-          ] })
-        ]
-      }
-    )
-  ] }) });
+    const id = BigInt(_nextId++);
+    const newBooking = {
+      id,
+      customerName: session.customerName,
+      customerEmail: session.customerEmail,
+      customerPhone: session.customerPhone,
+      serviceIds: session.serviceIds,
+      teamMemberId: session.teamMemberId,
+      preferredDateTime: session.preferredDateTime,
+      status: BookingStatus.confirmed,
+      paymentStatus: PaymentStatus.paid,
+      referenceCode: nextRefCode(),
+      createdAt: BigInt(Date.now()) * BigInt(1e6),
+      totalAmount: session.totalAmount,
+      stripeSessionId
+    };
+    bookingStore.push(newBooking);
+    pendingSessions.delete(stripeSessionId);
+    return { __kind__: "ok", ok: newBooking };
+  },
+  cancelBooking: async (id) => {
+    const idx = bookingStore.findIndex((b) => b.id === id);
+    if (idx === -1) return { __kind__: "err", err: "Booking not found" };
+    bookingStore[idx] = { ...bookingStore[idx], status: BookingStatus.cancelled };
+    return { __kind__: "ok", ok: bookingStore[idx] };
+  },
+  getBooking: async (id) => bookingStore.find((b) => b.id === id) ?? null,
+  getService: async (id) => sampleServices.find((s) => s.id === id) ?? null,
+  getTeamMember: async (id) => sampleTeamMembers.find((m) => m.id === id) ?? null,
+  // ── Stripe helpers (stubs — real impl is in backend canister) ──────────────
+  isStripeConfigured: async () => true,
+  setStripeConfiguration: async () => void 0,
+  createCheckoutSession: async () => "mock_checkout_url",
+  getStripeSessionStatus: async (sessionId) => ({
+    __kind__: "completed",
+    completed: { response: `mock_paid_${sessionId}` }
+  }),
+  transform: async (input) => ({
+    status: BigInt(200),
+    body: input.response.body,
+    headers: input.response.headers
+  })
+};
+async function toggleBookingPayment(id) {
+  const idx = bookingStore.findIndex((b) => b.id === id);
+  if (idx === -1) throw new Error("Booking not found");
+  bookingStore[idx] = {
+    ...bookingStore[idx],
+    paymentStatus: bookingStore[idx].paymentStatus === PaymentStatus.paid ? PaymentStatus.unpaid : PaymentStatus.paid
+  };
 }
 export {
-  Booking
+  Clock as C,
+  Input as I,
+  cn as a,
+  useMutation as b,
+  clsx as c,
+  mockBackend as m,
+  toggleBookingPayment as t,
+  useQuery as u
 };

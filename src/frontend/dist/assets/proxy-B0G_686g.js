@@ -1,4 +1,5 @@
-import { o as useRouterState, l as reactExports, q as React, j as jsxRuntimeExports, L as Link } from "./index-DJRfP8fw.js";
+import { u as useRouterState, a as React, j as jsxRuntimeExports, L as Link, r as reactExports } from "./index-hUMo4Dx_.js";
+import { c as createLucideIcon, S as Scissors, P as Phone } from "./scissors-nS2oxIpE.js";
 function useLocation(opts) {
   return useRouterState({
     select: (state) => state.location
@@ -10,106 +11,7 @@ function useLocation(opts) {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-const toCamelCase = (string) => string.replace(
-  /^([A-Z])|[\s-_]+(\w)/g,
-  (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase()
-);
-const toPascalCase = (string) => {
-  const camelCase = toCamelCase(string);
-  return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
-};
-const mergeClasses = (...classes) => classes.filter((className, index, array) => {
-  return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
-}).join(" ").trim();
-const hasA11yProp = (props) => {
-  for (const prop in props) {
-    if (prop.startsWith("aria-") || prop === "role" || prop === "title") {
-      return true;
-    }
-  }
-};
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-var defaultAttributes = {
-  xmlns: "http://www.w3.org/2000/svg",
-  width: 24,
-  height: 24,
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 2,
-  strokeLinecap: "round",
-  strokeLinejoin: "round"
-};
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const Icon = reactExports.forwardRef(
-  ({
-    color: color2 = "currentColor",
-    size = 24,
-    strokeWidth = 2,
-    absoluteStrokeWidth,
-    className = "",
-    children,
-    iconNode,
-    ...rest
-  }, ref) => reactExports.createElement(
-    "svg",
-    {
-      ref,
-      ...defaultAttributes,
-      width: size,
-      height: size,
-      stroke: color2,
-      strokeWidth: absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
-      className: mergeClasses("lucide", className),
-      ...!children && !hasA11yProp(rest) && { "aria-hidden": "true" },
-      ...rest
-    },
-    [
-      ...iconNode.map(([tag, attrs]) => reactExports.createElement(tag, attrs)),
-      ...Array.isArray(children) ? children : [children]
-    ]
-  )
-);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const createLucideIcon = (iconName, iconNode) => {
-  const Component = reactExports.forwardRef(
-    ({ className, ...props }, ref) => reactExports.createElement(Icon, {
-      ref,
-      iconNode,
-      className: mergeClasses(
-        `lucide-${toKebabCase(toPascalCase(iconName))}`,
-        `lucide-${iconName}`,
-        className
-      ),
-      ...props
-    })
-  );
-  Component.displayName = toPascalCase(iconName);
-  return Component;
-};
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$2 = [
+const __iconNode = [
   [
     "path",
     {
@@ -119,37 +21,7 @@ const __iconNode$2 = [
   ],
   ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }]
 ];
-const MapPin = createLucideIcon("map-pin", __iconNode$2);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$1 = [
-  [
-    "path",
-    {
-      d: "M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384",
-      key: "9njp5v"
-    }
-  ]
-];
-const Phone = createLucideIcon("phone", __iconNode$1);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode = [
-  ["circle", { cx: "6", cy: "6", r: "3", key: "1lh9wr" }],
-  ["path", { d: "M8.12 8.12 12 12", key: "1alkpv" }],
-  ["path", { d: "M20 4 8.12 15.88", key: "xgtan2" }],
-  ["circle", { cx: "6", cy: "18", r: "3", key: "fqmcym" }],
-  ["path", { d: "M14.8 14.8 20 20", key: "ptml3r" }]
-];
-const Scissors = createLucideIcon("scissors", __iconNode);
+const MapPin = createLucideIcon("map-pin", __iconNode);
 var DefaultContext = {
   color: void 0,
   size: void 0,
@@ -301,8 +173,6 @@ const footerIconBg = {
 };
 function Footer() {
   const year = (/* @__PURE__ */ new Date()).getFullYear();
-  const hostname = typeof window !== "undefined" ? window.location.hostname : "";
-  const caffeineUrl = `https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "footer",
     {
@@ -477,20 +347,21 @@ function Footer() {
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs", style: footerTextMuted, children: [
             "© ",
             year,
-            " Master Deepak Hair Expert. Built with love using",
-            " ",
+            " Master Deepak Hair Expert. All rights reserved."
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs", style: footerTextMuted, children: "Cut, Color & Chemical · Mumbai & Bhilwara" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "a",
               {
-                href: caffeineUrl,
-                target: "_blank",
-                rel: "noopener noreferrer",
-                className: "hover:text-accent transition-smooth",
-                children: "caffeine.ai"
+                href: "/admin",
+                "data-ocid": "footer-admin-link",
+                className: "text-[10px] opacity-30 hover:opacity-60 transition-smooth",
+                style: footerTextMuted,
+                children: "Admin"
               }
             )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs", style: footerTextMuted, children: "Cut, Color & Chemical · Mumbai & Bhilwara" })
+          ] })
         ] }) })
       ]
     }
@@ -498,12 +369,32 @@ function Footer() {
 }
 const NAV_LINKS = [
   { label: "Home", href: "/#home" },
-  { label: "Services", href: "/#services" },
   { label: "About", href: "/#about" },
+  { label: "Services", href: "/#services" },
   { label: "Gallery", href: "/#gallery" },
   { label: "Academy", href: "/#academy" },
   { label: "Contact", href: "/#contact" }
 ];
+const ALL_SECTION_IDS = [
+  "home",
+  "about",
+  "services",
+  "gallery",
+  "youtube",
+  // not a nav link — mapped to gallery below
+  "academy",
+  "contact"
+];
+const SECTION_TO_NAV = {
+  home: "home",
+  about: "about",
+  services: "services",
+  gallery: "gallery",
+  youtube: "gallery",
+  // while scrolling YouTube content, keep Gallery active
+  academy: "academy",
+  contact: "contact"
+};
 function useHeaderHeight(ref) {
   reactExports.useEffect(() => {
     const update = () => {
@@ -531,34 +422,67 @@ function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   reactExports.useEffect(() => {
-    const sections = NAV_LINKS.map((l) => l.href.replace("/#", ""));
+    const ratioMap = /* @__PURE__ */ new Map();
+    const pickActive = () => {
+      for (const id2 of ALL_SECTION_IDS) {
+        const ratio = ratioMap.get(id2) ?? 0;
+        if (ratio > 0) {
+          setActiveSection(SECTION_TO_NAV[id2] ?? id2);
+          return;
+        }
+      }
+      let last = null;
+      for (const id2 of ALL_SECTION_IDS) {
+        const el = document.getElementById(id2);
+        if (el) {
+          const { top } = el.getBoundingClientRect();
+          if (top <= window.innerHeight * 0.5) {
+            last = id2;
+          }
+        }
+      }
+      if (last) setActiveSection(SECTION_TO_NAV[last] ?? last);
+    };
     const observer2 = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
+          ratioMap.set(entry.target.id, entry.intersectionRatio);
         }
+        pickActive();
       },
-      { threshold: 0.35, rootMargin: "-60px 0px -40% 0px" }
+      {
+        root: null,
+        rootMargin: "-20% 0px -20% 0px",
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1]
+      }
     );
-    for (const id2 of sections) {
-      const el = document.getElementById(id2);
-      if (el) observer2.observe(el);
-    }
+    const observe = () => {
+      for (const id2 of ALL_SECTION_IDS) {
+        const el = document.getElementById(id2);
+        if (el) observer2.observe(el);
+      }
+    };
+    observe();
+    pickActive();
     return () => observer2.disconnect();
   }, []);
   if (prevPath.current !== location.pathname) {
     prevPath.current = location.pathname;
   }
   const handleAnchorClick = (href) => {
-    if (href.startsWith("/#")) {
-      const id2 = href.replace("/#", "");
-      const el = document.getElementById(id2);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      }
-    }
+    var _a;
+    if (!href.startsWith("/#")) return;
+    const id2 = href.replace("/#", "");
+    const el = document.getElementById(id2);
+    if (!el) return;
+    const headerHeight = ((_a = headerRef.current) == null ? void 0 : _a.getBoundingClientRect().height) ?? Number.parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue(
+        "--header-height"
+      )
+    ) ?? 80;
+    const elTop = el.getBoundingClientRect().top + window.scrollY;
+    const targetY = elTop - headerHeight - 8;
+    window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "header",
@@ -8524,7 +8448,5 @@ const motion = /* @__PURE__ */ createMotionProxy(featureBundle, createDomVisualE
 export {
   Layout as L,
   MapPin as M,
-  Scissors as S,
-  createLucideIcon as c,
   motion as m
 };

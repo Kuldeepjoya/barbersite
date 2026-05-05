@@ -14,6 +14,10 @@ export const BookingStatus = IDL.Variant({
   'pending' : IDL.Null,
   'confirmed' : IDL.Null,
 });
+export const PaymentStatus = IDL.Variant({
+  'paid' : IDL.Null,
+  'unpaid' : IDL.Null,
+});
 export const TeamMemberId = IDL.Nat;
 export const Timestamp = IDL.Int;
 export const ServiceId = IDL.Nat;
@@ -21,21 +25,38 @@ export const Booking = IDL.Record({
   'id' : BookingId,
   'customerName' : IDL.Text,
   'status' : BookingStatus,
+  'paymentStatus' : PaymentStatus,
   'customerPhone' : IDL.Text,
   'teamMemberId' : IDL.Opt(TeamMemberId),
   'createdAt' : Timestamp,
   'preferredDateTime' : IDL.Text,
-  'serviceId' : ServiceId,
+  'serviceIds' : IDL.Vec(ServiceId),
+  'referenceCode' : IDL.Text,
+  'totalAmount' : IDL.Nat,
+  'stripeSessionId' : IDL.Opt(IDL.Text),
   'customerEmail' : IDL.Text,
 });
 export const BookingResult = IDL.Variant({ 'ok' : Booking, 'err' : IDL.Text });
-export const BookingRequest = IDL.Record({
+export const ShoppingItem = IDL.Record({
+  'productName' : IDL.Text,
+  'currency' : IDL.Text,
+  'quantity' : IDL.Nat,
+  'priceInCents' : IDL.Nat,
+  'productDescription' : IDL.Text,
+});
+export const CheckoutRequest = IDL.Record({
   'customerName' : IDL.Text,
+  'cancelUrl' : IDL.Text,
   'customerPhone' : IDL.Text,
   'teamMemberId' : IDL.Opt(TeamMemberId),
   'preferredDateTime' : IDL.Text,
-  'serviceId' : ServiceId,
+  'serviceIds' : IDL.Vec(ServiceId),
   'customerEmail' : IDL.Text,
+  'successUrl' : IDL.Text,
+});
+export const CheckoutSessionResult = IDL.Variant({
+  'ok' : IDL.Record({ 'checkoutUrl' : IDL.Text, 'sessionId' : IDL.Text }),
+  'err' : IDL.Text,
 });
 export const ServiceCategory = IDL.Variant({
   'fade' : IDL.Null,
@@ -51,21 +72,68 @@ export const Service = IDL.Record({
   'category' : ServiceCategory,
   'price' : IDL.Nat,
 });
+export const StripeSessionStatus = IDL.Variant({
+  'completed' : IDL.Record({
+    'userPrincipal' : IDL.Opt(IDL.Text),
+    'response' : IDL.Text,
+  }),
+  'failed' : IDL.Record({ 'error' : IDL.Text }),
+});
 export const TeamMember = IDL.Record({
   'id' : TeamMemberId,
   'name' : IDL.Text,
   'specialty' : IDL.Text,
 });
+export const http_header = IDL.Record({
+  'value' : IDL.Text,
+  'name' : IDL.Text,
+});
+export const http_request_result = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
+});
+export const TransformationInput = IDL.Record({
+  'context' : IDL.Vec(IDL.Nat8),
+  'response' : http_request_result,
+});
+export const TransformationOutput = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
+});
 
 export const idlService = IDL.Service({
   'cancelBooking' : IDL.Func([BookingId], [BookingResult], []),
-  'createBooking' : IDL.Func([BookingRequest], [BookingResult], []),
+  'confirmBookingAfterPayment' : IDL.Func([IDL.Text], [BookingResult], []),
+  'createCheckoutSession' : IDL.Func(
+      [IDL.Vec(ShoppingItem), IDL.Text, IDL.Text],
+      [IDL.Text],
+      [],
+    ),
+  'createStripeCheckoutSession' : IDL.Func(
+      [CheckoutRequest],
+      [CheckoutSessionResult],
+      [],
+    ),
   'getBooking' : IDL.Func([BookingId], [IDL.Opt(Booking)], ['query']),
   'getService' : IDL.Func([ServiceId], [IDL.Opt(Service)], ['query']),
+  'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
   'getTeamMember' : IDL.Func([TeamMemberId], [IDL.Opt(TeamMember)], ['query']),
+  'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
+  'listAllBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
   'listBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+  'listBookingsByDate' : IDL.Func([IDL.Text], [IDL.Vec(Booking)], ['query']),
+  'listFutureBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
   'listServices' : IDL.Func([], [IDL.Vec(Service)], ['query']),
   'listTeamMembers' : IDL.Func([], [IDL.Vec(TeamMember)], ['query']),
+  'markBookingPaid' : IDL.Func([BookingId], [BookingResult], []),
+  'setStripeConfiguration' : IDL.Func([IDL.Text], [], []),
+  'transform' : IDL.Func(
+      [TransformationInput],
+      [TransformationOutput],
+      ['query'],
+    ),
 });
 
 export const idlInitArgs = [];
@@ -77,6 +145,7 @@ export const idlFactory = ({ IDL }) => {
     'pending' : IDL.Null,
     'confirmed' : IDL.Null,
   });
+  const PaymentStatus = IDL.Variant({ 'paid' : IDL.Null, 'unpaid' : IDL.Null });
   const TeamMemberId = IDL.Nat;
   const Timestamp = IDL.Int;
   const ServiceId = IDL.Nat;
@@ -84,21 +153,38 @@ export const idlFactory = ({ IDL }) => {
     'id' : BookingId,
     'customerName' : IDL.Text,
     'status' : BookingStatus,
+    'paymentStatus' : PaymentStatus,
     'customerPhone' : IDL.Text,
     'teamMemberId' : IDL.Opt(TeamMemberId),
     'createdAt' : Timestamp,
     'preferredDateTime' : IDL.Text,
-    'serviceId' : ServiceId,
+    'serviceIds' : IDL.Vec(ServiceId),
+    'referenceCode' : IDL.Text,
+    'totalAmount' : IDL.Nat,
+    'stripeSessionId' : IDL.Opt(IDL.Text),
     'customerEmail' : IDL.Text,
   });
   const BookingResult = IDL.Variant({ 'ok' : Booking, 'err' : IDL.Text });
-  const BookingRequest = IDL.Record({
+  const ShoppingItem = IDL.Record({
+    'productName' : IDL.Text,
+    'currency' : IDL.Text,
+    'quantity' : IDL.Nat,
+    'priceInCents' : IDL.Nat,
+    'productDescription' : IDL.Text,
+  });
+  const CheckoutRequest = IDL.Record({
     'customerName' : IDL.Text,
+    'cancelUrl' : IDL.Text,
     'customerPhone' : IDL.Text,
     'teamMemberId' : IDL.Opt(TeamMemberId),
     'preferredDateTime' : IDL.Text,
-    'serviceId' : ServiceId,
+    'serviceIds' : IDL.Vec(ServiceId),
     'customerEmail' : IDL.Text,
+    'successUrl' : IDL.Text,
+  });
+  const CheckoutSessionResult = IDL.Variant({
+    'ok' : IDL.Record({ 'checkoutUrl' : IDL.Text, 'sessionId' : IDL.Text }),
+    'err' : IDL.Text,
   });
   const ServiceCategory = IDL.Variant({
     'fade' : IDL.Null,
@@ -114,25 +200,69 @@ export const idlFactory = ({ IDL }) => {
     'category' : ServiceCategory,
     'price' : IDL.Nat,
   });
+  const StripeSessionStatus = IDL.Variant({
+    'completed' : IDL.Record({
+      'userPrincipal' : IDL.Opt(IDL.Text),
+      'response' : IDL.Text,
+    }),
+    'failed' : IDL.Record({ 'error' : IDL.Text }),
+  });
   const TeamMember = IDL.Record({
     'id' : TeamMemberId,
     'name' : IDL.Text,
     'specialty' : IDL.Text,
   });
+  const http_header = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
+  const http_request_result = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
+  });
+  const TransformationInput = IDL.Record({
+    'context' : IDL.Vec(IDL.Nat8),
+    'response' : http_request_result,
+  });
+  const TransformationOutput = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
+  });
   
   return IDL.Service({
     'cancelBooking' : IDL.Func([BookingId], [BookingResult], []),
-    'createBooking' : IDL.Func([BookingRequest], [BookingResult], []),
+    'confirmBookingAfterPayment' : IDL.Func([IDL.Text], [BookingResult], []),
+    'createCheckoutSession' : IDL.Func(
+        [IDL.Vec(ShoppingItem), IDL.Text, IDL.Text],
+        [IDL.Text],
+        [],
+      ),
+    'createStripeCheckoutSession' : IDL.Func(
+        [CheckoutRequest],
+        [CheckoutSessionResult],
+        [],
+      ),
     'getBooking' : IDL.Func([BookingId], [IDL.Opt(Booking)], ['query']),
     'getService' : IDL.Func([ServiceId], [IDL.Opt(Service)], ['query']),
+    'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
     'getTeamMember' : IDL.Func(
         [TeamMemberId],
         [IDL.Opt(TeamMember)],
         ['query'],
       ),
+    'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
+    'listAllBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
     'listBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
+    'listBookingsByDate' : IDL.Func([IDL.Text], [IDL.Vec(Booking)], ['query']),
+    'listFutureBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
     'listServices' : IDL.Func([], [IDL.Vec(Service)], ['query']),
     'listTeamMembers' : IDL.Func([], [IDL.Vec(TeamMember)], ['query']),
+    'markBookingPaid' : IDL.Func([BookingId], [BookingResult], []),
+    'setStripeConfiguration' : IDL.Func([IDL.Text], [], []),
+    'transform' : IDL.Func(
+        [TransformationInput],
+        [TransformationOutput],
+        ['query'],
+      ),
   });
 };
 

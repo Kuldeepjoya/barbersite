@@ -1,3 +1,25 @@
+type http_request_result = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type http_header = 
+ record {
+   name: text;
+   value: text;
+ };
+type TransformationOutput = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type TransformationInput = 
+ record {
+   context: blob;
+   response: http_request_result;
+ };
 type Timestamp = int;
 type TeamMemberId = nat;
 type TeamMember = 
@@ -5,6 +27,22 @@ type TeamMember =
    id: TeamMemberId;
    name: text;
    specialty: text;
+ };
+type StripeSessionStatus = 
+ variant {
+   completed: record {
+                response: text;
+                userPrincipal: opt text;
+              };
+   failed: record {error: text;};
+ };
+type ShoppingItem = 
+ record {
+   currency: text;
+   priceInCents: nat;
+   productDescription: text;
+   productName: text;
+   quantity: nat;
  };
 type ServiceId = nat;
 type ServiceCategory = 
@@ -23,6 +61,30 @@ type Service =
    name: text;
    price: nat;
  };
+type PaymentStatus = 
+ variant {
+   paid;
+   unpaid;
+ };
+type CheckoutSessionResult = 
+ variant {
+   err: text;
+   ok: record {
+         checkoutUrl: text;
+         sessionId: text;
+       };
+ };
+type CheckoutRequest = 
+ record {
+   cancelUrl: text;
+   customerEmail: text;
+   customerName: text;
+   customerPhone: text;
+   preferredDateTime: text;
+   serviceIds: vec ServiceId;
+   successUrl: text;
+   teamMemberId: opt TeamMemberId;
+ };
 type BookingStatus = 
  variant {
    cancelled;
@@ -34,15 +96,6 @@ type BookingResult =
    err: text;
    ok: Booking;
  };
-type BookingRequest = 
- record {
-   customerEmail: text;
-   customerName: text;
-   customerPhone: text;
-   preferredDateTime: text;
-   serviceId: ServiceId;
-   teamMemberId: opt TeamMemberId;
- };
 type BookingId = nat;
 type Booking = 
  record {
@@ -51,18 +104,34 @@ type Booking =
    customerName: text;
    customerPhone: text;
    id: BookingId;
+   paymentStatus: PaymentStatus;
    preferredDateTime: text;
-   serviceId: ServiceId;
+   referenceCode: text;
+   serviceIds: vec ServiceId;
    status: BookingStatus;
+   stripeSessionId: opt text;
    teamMemberId: opt TeamMemberId;
+   totalAmount: nat;
  };
 service : {
   cancelBooking: (id: BookingId) -> (BookingResult);
-  createBooking: (req: BookingRequest) -> (BookingResult);
+  confirmBookingAfterPayment: (stripeSessionId: text) -> (BookingResult);
+  createCheckoutSession: (items: vec ShoppingItem, successUrl: text,
+   cancelUrl: text) -> (text);
+  createStripeCheckoutSession: (req: CheckoutRequest) ->
+   (CheckoutSessionResult);
   getBooking: (id: BookingId) -> (opt Booking) query;
   getService: (id: ServiceId) -> (opt Service) query;
+  getStripeSessionStatus: (sessionId: text) -> (StripeSessionStatus);
   getTeamMember: (id: TeamMemberId) -> (opt TeamMember) query;
+  isStripeConfigured: () -> (bool) query;
+  listAllBookings: () -> (vec Booking) query;
   listBookings: () -> (vec Booking) query;
+  listBookingsByDate: (dateStr: text) -> (vec Booking) query;
+  listFutureBookings: () -> (vec Booking) query;
   listServices: () -> (vec Service) query;
   listTeamMembers: () -> (vec TeamMember) query;
+  markBookingPaid: (id: BookingId) -> (BookingResult);
+  setStripeConfiguration: (secretKey: text) -> ();
+  transform: (input: TransformationInput) -> (TransformationOutput) query;
 }

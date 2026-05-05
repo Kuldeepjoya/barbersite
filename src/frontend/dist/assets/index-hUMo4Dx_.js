@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/Home-BVy59ZWd.js","assets/proxy-ChzV7Zov.js","assets/Booking-CMCnhIcY.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/Home-BrZDBoLJ.js","assets/proxy-B0G_686g.js","assets/scissors-nS2oxIpE.js","assets/chevron-right-C1jcSNr5.js","assets/Booking-D5NhkUxa.js","assets/backend-DkdzDOtH.js","assets/Admin-D8qESBgR.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __typeError = (msg) => {
   throw TypeError(msg);
@@ -1354,6 +1354,15 @@ class HashValueErrorCode extends ErrorCode {
     return `Attempt to hash a value of unsupported type: ${this.value}`;
   }
 }
+function concat(...uint8Arrays) {
+  const result = new Uint8Array(uint8Arrays.reduce((acc, curr) => acc + curr.byteLength, 0));
+  let index2 = 0;
+  for (const b of uint8Arrays) {
+    result.set(b, index2);
+    index2 += b.byteLength;
+  }
+  return result;
+}
 class PipeArrayBuffer {
   /**
    * Save a checkpoint of the reading view (for backtracking)
@@ -1485,12 +1494,41 @@ function compare(u1, u2) {
 function uint8Equals$1(u1, u2) {
   return compare(u1, u2) === 0;
 }
+function uint8ToDataView(uint8) {
+  if (!(uint8 instanceof Uint8Array)) {
+    throw new Error("Input must be a Uint8Array");
+  }
+  return new DataView(uint8.buffer, uint8.byteOffset, uint8.byteLength);
+}
 function ilog2(n) {
   const nBig = BigInt(n);
   if (n <= 0) {
     throw new RangeError("Input must be positive");
   }
   return nBig.toString(2).length - 1;
+}
+function iexp2(n) {
+  const nBig = BigInt(n);
+  if (n < 0) {
+    throw new RangeError("Input must be non-negative");
+  }
+  return BigInt(1) << nBig;
+}
+function eob() {
+  throw new Error("unexpected end of buffer");
+}
+function safeRead(pipe, num) {
+  if (pipe.byteLength < num) {
+    eob();
+  }
+  return pipe.read(num);
+}
+function safeReadUint8(pipe) {
+  const byte = pipe.readUint8();
+  if (byte === void 0) {
+    eob();
+  }
+  return byte;
 }
 function lebEncode(value) {
   if (typeof value === "number") {
@@ -1512,6 +1550,114 @@ function lebEncode(value) {
     }
   }
   return pipe.buffer;
+}
+function lebDecode(pipe) {
+  let weight = BigInt(1);
+  let value = BigInt(0);
+  let byte;
+  do {
+    byte = safeReadUint8(pipe);
+    value += BigInt(byte & 127).valueOf() * weight;
+    weight *= BigInt(128);
+  } while (byte >= 128);
+  return value;
+}
+function slebEncode(value) {
+  if (typeof value === "number") {
+    value = BigInt(value);
+  }
+  const isNeg = value < BigInt(0);
+  if (isNeg) {
+    value = -value - BigInt(1);
+  }
+  const byteLength = (value === BigInt(0) ? 0 : ilog2(value)) + 1;
+  const pipe = new PipeArrayBuffer(new Uint8Array(byteLength), 0);
+  while (true) {
+    const i = getLowerBytes(value);
+    value /= BigInt(128);
+    if (isNeg && value === BigInt(0) && (i & 64) !== 0 || !isNeg && value === BigInt(0) && (i & 64) === 0) {
+      pipe.write(new Uint8Array([i]));
+      break;
+    } else {
+      pipe.write(new Uint8Array([i | 128]));
+    }
+  }
+  function getLowerBytes(num) {
+    const bytes = num % BigInt(128);
+    if (isNeg) {
+      return Number(BigInt(128) - bytes - BigInt(1));
+    } else {
+      return Number(bytes);
+    }
+  }
+  return pipe.buffer;
+}
+function slebDecode(pipe) {
+  const pipeView = new Uint8Array(pipe.buffer);
+  let len = 0;
+  for (; len < pipeView.byteLength; len++) {
+    if (pipeView[len] < 128) {
+      if ((pipeView[len] & 64) === 0) {
+        return lebDecode(pipe);
+      }
+      break;
+    }
+  }
+  const bytes = new Uint8Array(safeRead(pipe, len + 1));
+  let value = BigInt(0);
+  for (let i = bytes.byteLength - 1; i >= 0; i--) {
+    value = value * BigInt(128) + BigInt(128 - (bytes[i] & 127) - 1);
+  }
+  return -value - BigInt(1);
+}
+function writeUIntLE(value, byteLength) {
+  if (BigInt(value) < BigInt(0)) {
+    throw new Error("Cannot write negative values.");
+  }
+  return writeIntLE(value, byteLength);
+}
+function writeIntLE(value, byteLength) {
+  value = BigInt(value);
+  const pipe = new PipeArrayBuffer(new Uint8Array(Math.min(1, byteLength)), 0);
+  let i = 0;
+  let mul = BigInt(256);
+  let sub = BigInt(0);
+  let byte = Number(value % mul);
+  pipe.write(new Uint8Array([byte]));
+  while (++i < byteLength) {
+    if (value < 0 && sub === BigInt(0) && byte !== 0) {
+      sub = BigInt(1);
+    }
+    byte = Number((value / mul - sub) % BigInt(256));
+    pipe.write(new Uint8Array([byte]));
+    mul *= BigInt(256);
+  }
+  return pipe.buffer;
+}
+function readUIntLE(pipe, byteLength) {
+  if (byteLength <= 0 || !Number.isInteger(byteLength)) {
+    throw new Error("Byte length must be a positive integer");
+  }
+  let val = BigInt(safeReadUint8(pipe));
+  let mul = BigInt(1);
+  let i = 0;
+  while (++i < byteLength) {
+    mul *= BigInt(256);
+    const byte = BigInt(safeReadUint8(pipe));
+    val = val + mul * byte;
+  }
+  return val;
+}
+function readIntLE(pipe, byteLength) {
+  if (byteLength <= 0 || !Number.isInteger(byteLength)) {
+    throw new Error("Byte length must be a positive integer");
+  }
+  let val = readUIntLE(pipe, byteLength);
+  const mul = BigInt(2) ** (BigInt(8) * BigInt(byteLength - 1) + BigInt(7));
+  if (val >= mul) {
+    val -= mul * BigInt(2);
+  }
+  return val;
 }
 function uint8FromBufLike(bufLike) {
   if (!bufLike) {
@@ -18624,8 +18770,7 @@ var bt = 1, yt = class {
 }, v = new yt(), ne = (n, e) => {
   let t = (e == null ? void 0 : e.id) || bt++;
   return v.addToast({ title: n, ...e, id: t }), t;
-}, ie = (n) => n && typeof n == "object" && "ok" in n && typeof n.ok == "boolean" && "status" in n && typeof n.status == "number", le = ne, ce = () => v.toasts, de = () => v.getActiveToasts();
-Object.assign(le, { success: v.success, info: v.info, warning: v.warning, error: v.error, custom: v.custom, message: v.message, promise: v.promise, dismiss: v.dismiss, loading: v.loading }, { getHistory: ce, getToasts: de });
+}, ie = (n) => n && typeof n == "object" && "ok" in n && typeof n.ok == "boolean" && "status" in n && typeof n.status == "number", le = ne, ce = () => v.toasts, de = () => v.getActiveToasts(), ue = Object.assign(le, { success: v.success, info: v.info, warning: v.warning, error: v.error, custom: v.custom, message: v.message, promise: v.promise, dismiss: v.dismiss, loading: v.loading }, { getHistory: ce, getToasts: de });
 function wt(n, { insertAt: e } = {}) {
   if (typeof document == "undefined") return;
   let t = document.head || document.getElementsByTagName("head")[0], a = document.createElement("style");
@@ -24045,10 +24190,13 @@ function RouterProvider({ router: router2, ...rest }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(RouterContextProvider, { router: router2, ...rest, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Matches, {}) });
 }
 const Home = reactExports.lazy(
-  () => __vitePreload(() => import("./Home-BVy59ZWd.js"), true ? __vite__mapDeps([0,1]) : void 0).then((m) => ({ default: m.Home }))
+  () => __vitePreload(() => import("./Home-BrZDBoLJ.js"), true ? __vite__mapDeps([0,1,2,3]) : void 0).then((m) => ({ default: m.Home }))
 );
 const Booking = reactExports.lazy(
-  () => __vitePreload(() => import("./Booking-CMCnhIcY.js"), true ? __vite__mapDeps([2,1]) : void 0).then((m) => ({ default: m.Booking }))
+  () => __vitePreload(() => import("./Booking-D5NhkUxa.js"), true ? __vite__mapDeps([4,1,2,5]) : void 0).then((m) => ({ default: m.Booking }))
+);
+const Admin = reactExports.lazy(
+  () => __vitePreload(() => import("./Admin-D8qESBgR.js"), true ? __vite__mapDeps([6,5,2,3]) : void 0).then((m) => ({ default: m.Admin }))
 );
 const rootRoute = createRootRoute({
   component: () => /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-h-screen bg-background" }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(Outlet, {}) })
@@ -24063,7 +24211,12 @@ const bookingRoute = createRoute({
   path: "/booking",
   component: Booking
 });
-const routeTree = rootRoute.addChildren([homeRoute, bookingRoute]);
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin",
+  component: Admin
+});
+const routeTree = rootRoute.addChildren([homeRoute, bookingRoute, adminRoute]);
 const router = createRouter({ routeTree });
 function App() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -24071,36 +24224,308 @@ function App() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(Toaster, { richColors: true, position: "top-right" })
   ] });
 }
+const AUTH_KEY = "mdhe_auth";
+const VALID_EMAIL = "kuldeepjoya439@gmail.com";
+const VALID_PASSWORD = "kuldeepjoya@007";
+function LoginGate({ children }) {
+  const [isAuth, setIsAuth] = reactExports.useState(() => {
+    return localStorage.getItem(AUTH_KEY) === "true";
+  });
+  const [email, setEmail] = reactExports.useState("");
+  const [password, setPassword] = reactExports.useState("");
+  const [error, setError] = reactExports.useState("");
+  const [showPassword, setShowPassword] = reactExports.useState(false);
+  const [isLoading, setIsLoading] = reactExports.useState(false);
+  reactExports.useEffect(() => {
+    if (isAuth) {
+      localStorage.setItem(AUTH_KEY, "true");
+    }
+  }, [isAuth]);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+    setTimeout(() => {
+      if (email.trim() === VALID_EMAIL && password === VALID_PASSWORD) {
+        localStorage.setItem(AUTH_KEY, "true");
+        setIsAuth(true);
+      } else {
+        setError("Incorrect ID or password");
+      }
+      setIsLoading(false);
+    }, 400);
+  };
+  if (isAuth) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      className: "min-h-screen bg-background flex items-center justify-center px-4",
+      style: {
+        background: "linear-gradient(135deg, oklch(0.97 0.004 80) 0%, oklch(0.93 0.008 75) 50%, oklch(0.97 0.004 80) 100%)"
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "fixed inset-0 opacity-[0.03] pointer-events-none",
+            style: {
+              backgroundImage: "repeating-linear-gradient(45deg, oklch(0.65 0.15 68) 0px, oklch(0.65 0.15 68) 1px, transparent 1px, transparent 60px), repeating-linear-gradient(-45deg, oklch(0.65 0.15 68) 0px, oklch(0.65 0.15 68) 1px, transparent 1px, transparent 60px)"
+            }
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full max-w-md", "data-ocid": "login_gate.card", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-card shadow-elevated rounded-sm border border-border overflow-hidden", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "h-1 w-full",
+                style: {
+                  background: "linear-gradient(90deg, oklch(0.55 0.17 68), oklch(0.72 0.14 75), oklch(0.55 0.17 68))"
+                }
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-10 py-10", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4 mb-10", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "img",
+                  {
+                    src: "/assets/images/logo.png",
+                    alt: "Master Deepak Hair Expert",
+                    className: "h-16 w-16 object-contain"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "section-label mb-1", children: "Welcome to" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-display text-2xl font-bold tracking-tight text-foreground leading-tight", children: "Master Deepak" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gradient-gold font-display text-sm font-semibold tracking-widest uppercase mt-0.5", children: "Hair Expert" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "gold-rule" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "form",
+                {
+                  onSubmit: handleSubmit,
+                  className: "flex flex-col gap-5",
+                  "data-ocid": "login_gate.form",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1.5", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "label",
+                        {
+                          htmlFor: "login-email",
+                          className: "text-xs font-semibold uppercase tracking-widest text-muted-foreground",
+                          children: "Email / ID"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          id: "login-email",
+                          type: "email",
+                          autoComplete: "email",
+                          value: email,
+                          onChange: (e) => {
+                            setEmail(e.target.value);
+                            setError("");
+                          },
+                          placeholder: "Enter your email",
+                          className: "w-full px-4 py-3 rounded-sm border border-input bg-background text-foreground text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-smooth",
+                          "data-ocid": "login_gate.input"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1.5", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "label",
+                        {
+                          htmlFor: "login-password",
+                          className: "text-xs font-semibold uppercase tracking-widest text-muted-foreground",
+                          children: "Password"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "input",
+                          {
+                            id: "login-password",
+                            type: showPassword ? "text" : "password",
+                            autoComplete: "current-password",
+                            value: password,
+                            onChange: (e) => {
+                              setPassword(e.target.value);
+                              setError("");
+                            },
+                            placeholder: "Enter your password",
+                            className: "w-full px-4 py-3 pr-11 rounded-sm border border-input bg-background text-foreground text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-smooth",
+                            "data-ocid": "login_gate.password_input"
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "button",
+                          {
+                            type: "button",
+                            onClick: () => setShowPassword((v2) => !v2),
+                            className: "absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-accent transition-smooth focus-visible:outline-none",
+                            "aria-label": showPassword ? "Hide password" : "Show password",
+                            "data-ocid": "login_gate.toggle_password",
+                            children: showPassword ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                              "svg",
+                              {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                width: "17",
+                                height: "17",
+                                viewBox: "0 0 24 24",
+                                fill: "none",
+                                stroke: "currentColor",
+                                strokeWidth: "2",
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                                "aria-hidden": "true",
+                                children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "1", y1: "1", x2: "23", y2: "23" })
+                                ]
+                              }
+                            ) : /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                              "svg",
+                              {
+                                xmlns: "http://www.w3.org/2000/svg",
+                                width: "17",
+                                height: "17",
+                                viewBox: "0 0 24 24",
+                                fill: "none",
+                                stroke: "currentColor",
+                                strokeWidth: "2",
+                                strokeLinecap: "round",
+                                strokeLinejoin: "round",
+                                "aria-hidden": "true",
+                                children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "12", cy: "12", r: "3" })
+                                ]
+                              }
+                            )
+                          }
+                        )
+                      ] })
+                    ] }),
+                    error && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "p",
+                      {
+                        className: "text-sm text-destructive font-medium text-center -mt-1",
+                        "data-ocid": "login_gate.error_state",
+                        role: "alert",
+                        children: error
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "button",
+                      {
+                        type: "submit",
+                        disabled: isLoading || !email || !password,
+                        className: "btn-primary w-full mt-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:brightness-100",
+                        "data-ocid": "login_gate.submit_button",
+                        children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "svg",
+                            {
+                              className: "animate-spin h-4 w-4",
+                              xmlns: "http://www.w3.org/2000/svg",
+                              fill: "none",
+                              viewBox: "0 0 24 24",
+                              "aria-hidden": "true",
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  "circle",
+                                  {
+                                    className: "opacity-25",
+                                    cx: "12",
+                                    cy: "12",
+                                    r: "10",
+                                    stroke: "currentColor",
+                                    strokeWidth: "4"
+                                  }
+                                ),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  "path",
+                                  {
+                                    className: "opacity-75",
+                                    fill: "currentColor",
+                                    d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                  }
+                                )
+                              ]
+                            }
+                          ),
+                          "Verifying…"
+                        ] }) : "Enter Site"
+                      }
+                    )
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-center text-[11px] text-muted-foreground mt-8 tracking-wide", children: "This is a private website. Access is restricted to authorised personnel only." })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-center text-[10px] text-muted-foreground/50 mt-6 tracking-widest uppercase", children: [
+            "© ",
+            (/* @__PURE__ */ new Date()).getFullYear(),
+            " Master Deepak Hair Expert"
+          ] })
+        ] })
+      ]
+    }
+  );
+}
 BigInt.prototype.toJSON = function() {
   return this.toString();
 };
 const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(InternetIdentityProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) }) })
+  /* @__PURE__ */ jsxRuntimeExports.jsx(LoginGate, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(InternetIdentityProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) }) }) })
 );
 export {
+  isValidTimeout as A,
+  timeUntilStale as B,
+  timeoutManager as C,
+  focusManager as D,
+  fetchState as E,
+  replaceData as F,
+  notifyManager as G,
+  hashKey as H,
+  getDefaultState as I,
+  shouldThrowError as J,
   Link as L,
+  PipeArrayBuffer as P,
   React$5 as R,
   Subscribable as S,
-  resolveStaleTime as a,
-  timeoutManager as b,
-  fetchState as c,
-  replaceData as d,
-  environmentManager as e,
-  focusManager as f,
-  notifyManager as g,
-  hashKey as h,
-  isValidTimeout as i,
+  React$4 as a,
+  useQueryClient as b,
+  ue as c,
+  concat as d,
+  lebDecode as e,
+  safeRead as f,
+  safeReadUint8 as g,
+  readUIntLE as h,
+  iexp2 as i,
   jsxRuntimeExports as j,
-  getDefaultState as k,
-  reactExports as l,
-  shouldThrowError as m,
-  noop$6 as n,
-  useRouterState as o,
-  pendingThenable as p,
-  React$4 as q,
-  resolveEnabled as r,
-  shallowEqualObjects as s,
-  timeUntilStale as t,
-  useQueryClient as u
+  writeIntLE as k,
+  lebEncode as l,
+  readIntLE as m,
+  Principal as n,
+  slebDecode as o,
+  uint8ToDataView as p,
+  pendingThenable as q,
+  reactExports as r,
+  slebEncode as s,
+  resolveEnabled as t,
+  useRouterState as u,
+  shallowEqualObjects as v,
+  writeUIntLE as w,
+  resolveStaleTime as x,
+  noop$6 as y,
+  environmentManager as z
 };

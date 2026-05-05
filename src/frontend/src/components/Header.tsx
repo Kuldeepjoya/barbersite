@@ -4,12 +4,35 @@ import { SiYoutube } from "react-icons/si";
 
 const NAV_LINKS = [
   { label: "Home", href: "/#home" },
-  { label: "Services", href: "/#services" },
   { label: "About", href: "/#about" },
+  { label: "Services", href: "/#services" },
   { label: "Gallery", href: "/#gallery" },
   { label: "Academy", href: "/#academy" },
   { label: "Contact", href: "/#contact" },
 ];
+
+// All DOM section IDs that the observer watches, including non-nav ones.
+// youtube is intentionally included so we can map it → gallery in the nav.
+const ALL_SECTION_IDS = [
+  "home",
+  "about",
+  "services",
+  "gallery",
+  "youtube", // not a nav link — mapped to gallery below
+  "academy",
+  "contact",
+];
+
+// Map a watched section id → the NAV_LINKS id that should be highlighted.
+const SECTION_TO_NAV: Record<string, string> = {
+  home: "home",
+  about: "about",
+  services: "services",
+  gallery: "gallery",
+  youtube: "gallery", // while scrolling YouTube content, keep Gallery active
+  academy: "academy",
+  contact: "contact",
+};
 
 // Keep CSS variable in sync with actual header height
 function useHeaderHeight(ref: React.RefObject<HTMLElement | null>) {
@@ -42,23 +65,68 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Track active section for highlight
+  // IntersectionObserver-based scroll spy
   useEffect(() => {
-    const sections = NAV_LINKS.map((l) => l.href.replace("/#", ""));
+    // Tracks the current intersection ratio for every observed section.
+    const ratioMap = new Map<string, number>();
+
+    // Pick the "active" section from what's currently intersecting.
+    // Strategy: prefer the topmost section that is intersecting (has ratio > 0),
+    // based on its natural DOM order (ALL_SECTION_IDS order = top-to-bottom).
+    const pickActive = () => {
+      for (const id of ALL_SECTION_IDS) {
+        const ratio = ratioMap.get(id) ?? 0;
+        if (ratio > 0) {
+          setActiveSection(SECTION_TO_NAV[id] ?? id);
+          return;
+        }
+      }
+      // Nothing intersecting — fallback: whichever section we scrolled past last.
+      // Find the last section whose top edge is above the viewport midpoint.
+      let last: string | null = null;
+      for (const id of ALL_SECTION_IDS) {
+        const el = document.getElementById(id);
+        if (el) {
+          const { top } = el.getBoundingClientRect();
+          if (top <= window.innerHeight * 0.5) {
+            last = id;
+          }
+        }
+      }
+      if (last) setActiveSection(SECTION_TO_NAV[last] ?? last);
+    };
+
+    // rootMargin: fire when a section enters the band between 20% and 80% from the
+    // top — i.e. the section occupies roughly the middle 60% of the viewport.
+    // '-20% 0px -20% 0px' means: shrink the root box by 20% on top and 20% on
+    // bottom, so we only count the middle 60% of the viewport.
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
+          ratioMap.set(entry.target.id, entry.intersectionRatio);
         }
+        pickActive();
       },
-      { threshold: 0.35, rootMargin: "-60px 0px -40% 0px" },
+      {
+        root: null,
+        rootMargin: "-20% 0px -20% 0px",
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
+      },
     );
-    for (const id of sections) {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    }
+
+    // Observe all sections (they may not exist yet if the page hasn't hydrated).
+    const observe = () => {
+      for (const id of ALL_SECTION_IDS) {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      }
+    };
+
+    observe();
+
+    // Run initial active detection once the DOM is ready.
+    pickActive();
+
     return () => observer.disconnect();
   }, []);
 
@@ -67,13 +135,26 @@ export function Header() {
   }
 
   const handleAnchorClick = (href: string) => {
-    if (href.startsWith("/#")) {
-      const id = href.replace("/#", "");
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      }
-    }
+    if (!href.startsWith("/#")) return;
+    const id = href.replace("/#", "");
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    // Obtain the header height so we can offset the scroll correctly.
+    const headerHeight =
+      headerRef.current?.getBoundingClientRect().height ??
+      Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--header-height",
+        ),
+      ) ??
+      80;
+
+    const elTop = el.getBoundingClientRect().top + window.scrollY;
+    // Subtract header height plus a small breathing gap (8 px).
+    const targetY = elTop - headerHeight - 8;
+
+    window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
   };
 
   return (

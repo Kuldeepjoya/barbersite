@@ -14,6 +14,9 @@ const Home = lazy(() =>
 const Booking = lazy(() =>
   import("@/pages/Booking").then((m) => ({ default: m.Booking })),
 );
+const Admin = lazy(() =>
+  import("@/pages/Admin").then((m) => ({ default: m.Admin })),
+);
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -35,7 +38,13 @@ const bookingRoute = createRoute({
   component: Booking,
 });
 
-const routeTree = rootRoute.addChildren([homeRoute, bookingRoute]);
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin",
+  component: Admin,
+});
+
+const routeTree = rootRoute.addChildren([homeRoute, bookingRoute, adminRoute]);
 
 const router = createRouter({ routeTree });
 
